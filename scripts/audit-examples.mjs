@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { buildConceptExample } from "../app/conceptExamples.ts";
 import { allConcepts, conceptGroups } from "../app/concepts.ts";
+import { levelForConcept } from "../app/learningLevels.ts";
 import { sourceDefinitions } from "../app/sourceDefinitions.ts";
 
 const markdown = await readFile(new URL("../public/encyclopedia.md", import.meta.url), "utf8");
@@ -27,12 +28,14 @@ for (const concept of allConcepts) {
   if (!entry) { failures.push(`Missing entry: ${concept.term}`); continue; }
   const source = sourceDefinitions[entry.number];
   if (!source?.english) { failures.push(`Missing English definition: ${concept.term}`); continue; }
-  const example = buildConceptExample(entry, concept, source.english);
+  const level = levelForConcept(concept);
+  const example = buildConceptExample(entry, concept, source.english, level);
   examples.push({ concept, example });
   if (!example.chinese.includes(concept.term)) failures.push(`Chinese example lacks term: ${concept.term}`);
   if (!example.english.includes(concept.term)) failures.push(`English example lacks term: ${concept.term}`);
-  if (example.chinese.length < 150) failures.push(`Chinese example too short: ${concept.term}`);
-  if (example.english.length < 180) failures.push(`English example too short: ${concept.term}`);
+  if (example.chinese.length < (level === "undergraduate" ? 95 : 150)) failures.push(`Chinese example too short: ${concept.term}`);
+  if (example.english.length < (level === "undergraduate" ? 160 : 180)) failures.push(`English example too short: ${concept.term}`);
+  if (level === "undergraduate" && /研究者|分析者|关键片段|分析关系/.test(example.chinese.split("为什么：")[0])) failures.push(`Undergraduate example is too research-oriented: ${concept.term}`);
 }
 
 const groupIds = new Set(conceptGroups.map((group) => group.id));
@@ -51,6 +54,7 @@ console.log(JSON.stringify({
   entries: entries.length,
   examples: examples.length,
   groups: groupIds.size,
+  levels: Object.fromEntries(["undergraduate", "graduate", "doctoral"].map((level) => [level, allConcepts.filter((concept) => levelForConcept(concept) === level).length])),
   chineseLength: { min: Math.min(...examples.map(({ example }) => example.chinese.length)), average: average(examples.map(({ example }) => example.chinese.length)) },
   englishLength: { min: Math.min(...examples.map(({ example }) => example.english.length)), average: average(examples.map(({ example }) => example.english.length)) },
   duplicateChinese,

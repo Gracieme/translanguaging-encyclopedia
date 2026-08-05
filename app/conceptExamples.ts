@@ -15,6 +15,8 @@ export type ConceptExample = {
   english: string;
 };
 
+export type ExampleLevel = "undergraduate" | "graduate" | "doctoral";
+
 type Frame = {
   scenesZh: string[];
   scenesEn: string[];
@@ -321,6 +323,66 @@ const frames: Record<string, Frame> = {
 
 const defaultFrame = frames.extensions;
 
+const undergraduateGroupScenes: Record<string, { chinese: string; english: string }> = {
+  foundations: { chinese: "学生做小组海报时，一边说话，一边画箭头、移动图片，还用表情和手势帮助同伴理解", english: "While making a group poster, students talk, draw arrows, move images, and use facial expression and gesture to help one another understand" },
+  boundaries: { chinese: "小林在家说方言，在学校说普通话，和朋友聊天时又会自然地用到英语词", english: "Lin uses a regional variety at home, Mandarin at school, and English words naturally when chatting with friends" },
+  power: { chinese: "两位学生给出同样正确的答案，老师却因为其中一人的口音而觉得他‘不够聪明’", english: "Two students give the same correct answer, but a teacher treats one as less intelligent because of the student’s accent" },
+  identity: { chinese: "一名新生和家人、老同学及新同学说话时采用不同表达，让别人看到自己不同的一面", english: "A new student speaks differently with family, old friends, and new classmates, showing different aspects of self" },
+  sociolinguistics: { chinese: "小张对老师说‘您好’，对朋友说‘你来啦’，同一个人会随对象和场合改变说法", english: "Zhang says a formal greeting to a teacher and a casual one to a friend, changing speech with audience and situation" },
+  discourse: { chinese: "朋友说‘这里有点冷’，另一人马上关窗；这句话在当时不只是描述温度，也是在提出请求", english: "A friend says, ‘It is a little cold here,’ and someone closes the window; in context the sentence functions as a request, not only a temperature report" },
+  sla: { chinese: "学生第一次学会一个英语表达后，在几天后的新任务里又能独立用出来", english: "After first learning an English expression, a student can use it independently in a new task several days later" },
+  policy: { chinese: "学校通知写着‘课堂只能说英语’，但不同老师对小组讨论时能否说中文有不同做法", english: "A school notice says ‘English only in class,’ but teachers differ over whether students may use Chinese during group work" },
+};
+
+const undergraduateTermScenes: Record<string, { chinese: string; english: string }> = {
+  "E-language": { chinese: "英语词典收录的单词、语法书写下的规则，以及语料库保存的大量真实句子，都是可以放在个人头脑之外观察的‘英语’", english: "Words listed in an English dictionary, rules printed in a grammar book, and sentences stored in a corpus are all forms of ‘English’ that can be observed outside any one person’s mind" },
+  "I-language": { chinese: "小美从没背过‘疑问句规则’，却能立刻判断一个没听过的句子听起来对不对；这里关注的是她头脑里的语言知识", english: "Mei has never memorized a rule for questions, yet she can judge whether a new sentence sounds possible; the focus is her internal linguistic knowledge" },
+  "Named languages": { chinese: "学校把课表分成‘中文课’和‘英文课’，这些名称方便管理，但不代表学生头脑里的语言资源真的被分成两个盒子", english: "A timetable separates ‘Chinese’ and ‘English’ classes; the names help administration but do not prove that students’ linguistic resources exist in two mental boxes" },
+  "Translanguaging": { chinese: "学生先用中文和同桌想清楚一道科学题，阅读英文材料，再用英文回答并画图说明；他调动了全部语言和符号资源完成学习", english: "A student discusses a science problem in Chinese, reads an English source, and answers in English with a diagram, using the full repertoire to learn" },
+  "Languaging": { chinese: "学生一边说‘我先乘还是先加呢’，一边整理自己的思路；说话不只是报告答案，也帮助他把答案想出来", english: "A student says, ‘Do I multiply or add first?’ while working; speaking does not merely report the answer but helps the student think it through" },
+  "Multimodality": { chinese: "老师解释水循环时同时使用口头讲解、箭头图、颜色和手势，这些不同方式一起传递意义", english: "A teacher explains the water cycle through speech, arrows, colors, and gesture, with the different modes working together" },
+  "Meaning-making": { chinese: "看到门上画着火焰的红色标志，人们结合图像、颜色和所在位置，理解这里是在提示火灾危险", english: "People see a red flame sign on a door and combine image, color, and location to understand a fire warning" },
+  "Bilingualism": { chinese: "小安在家主要说粤语，在学校主要使用英语，并能根据对象和事情选择合适资源", english: "An uses mostly Cantonese at home and English at school and can select resources according to person and purpose" },
+  "Multilingualism": { chinese: "一家餐馆的员工和顾客日常使用普通话、粤语、英语和韩语，几种语言共同存在于同一个社会空间", english: "Workers and customers in a restaurant routinely use Mandarin, Cantonese, English, and Korean in the same social space" },
+  "Plurilingualism": { chinese: "旅行者英语很流利、法语只会点餐、西班牙语能看路牌；这些不均衡的能力合在一起构成他的个人语言资源", english: "A traveler speaks fluent English, can order food in French, and read signs in Spanish; these uneven abilities form one personal repertoire" },
+  "Code-switching": { chinese: "小王对朋友说‘我们明天 meeting 以后吃饭吧’，在一句话里从中文转换到英语词 meeting", english: "Wang tells a friend, ‘We can eat after tomorrow’s meeting,’ switching from Chinese to the English word ‘meeting’ within the utterance" },
+  "Register": { chinese: "同一个人给导师写邮件时用‘烦请查收’，给朋友发消息时说‘你看看’，因为活动和关系不同而采用不同表达", english: "The same person writes formally to a supervisor but casually to a friend, selecting language suited to activity and relationship" },
+  "Style": { chinese: "学生做正式演讲时说话清楚完整，课后与好友聊天时缩短词语、使用网络梗，这是说话风格的变化", english: "A student speaks carefully in a presentation but uses shortened forms and memes with friends, shifting speaking style" },
+  "Dialect": { chinese: "‘土豆’‘马铃薯’和‘洋芋’指相近事物，却在不同地区更常用，体现地域语言变体", english: "Different regions use different everyday words for the same food, illustrating regional varieties" },
+  "Accent": { chinese: "两个人使用相同英语词汇和语法，但元音发音不同，听者因此听出不同地区口音", english: "Two people use the same English words and grammar but pronounce vowels differently, allowing listeners to hear different accents" },
+  "Language ideology": { chinese: "有人认为‘只有普通话才算说得标准’，这不是语言本身的事实，而是一种关于什么语言更正确的社会信念", english: "Someone claims that only Putonghua is ‘proper’; this is not a fact inherent in language but a social belief about correctness" },
+  "Communicative competence": { chinese: "学生语法没有错误，却在第一次见老师时说‘喂，你’，句子正确但不符合当时的关系和场合", english: "A student uses a grammatically correct greeting that is too casual for meeting a teacher; the sentence is correct but inappropriate to the situation" },
+  "Belonging": { chinese: "转学生学会同学常用的称呼和玩笑后，逐渐能参加午餐聊天，并感觉自己是班级的一员", english: "After learning classmates’ usual forms of address and jokes, a transfer student joins lunchtime talk and feels part of the class" },
+  "Othering": { chinese: "同学总把一名新生称作‘那个外国人’，即使他已经长期生活在这里，这种说法持续把他当成群体之外的人", english: "Classmates keep calling a long-term local student ‘the foreigner,’ repeatedly positioning the student outside the group" },
+  "Stereotype": { chinese: "有人还没认识新同学，就因为他来自某个国家而认定他一定擅长数学，这是对群体的固定化想象", english: "Before meeting a new classmate, someone assumes that the classmate must be good at mathematics because of nationality; this is a fixed group image" },
+  "Prejudice": { chinese: "一名房东听到租客的外地口音后，立刻觉得对方‘不可靠’，这种负面判断并没有来自个人行为证据", english: "A landlord hears a regional accent and immediately judges the speaker unreliable without evidence from the person’s behavior" },
+  "Discrimination": { chinese: "两名条件相同的求职者中，一人只因姓名和口音被拒绝面试，负面看法已经变成了不平等行动", english: "Two applicants have equal qualifications, but one is denied an interview because of name and accent; a negative judgment has become unequal treatment" },
+};
+
+const undergraduateGroupContrasts: Record<string, { chinese: string; english: string }> = {
+  foundations: { chinese: "重点是这些资源怎样共同产生意义，不是简单数一数用了多少种符号。", english: "Focus on how the resources work together to make meaning, not simply on counting modes." },
+  boundaries: { chinese: "重点是语言资源怎样被区分和使用，不能只看学校或词典给它们贴的名称。", english: "Focus on how resources are distinguished and used, not only on the names assigned by schools or dictionaries." },
+  power: { chinese: "偏见是负面判断；当判断进一步造成拒绝、处罚或机会差异时，才成为歧视行动。", english: "Prejudice is a negative judgment; discrimination occurs when it produces unequal action, punishment, or opportunity." },
+  identity: { chinese: "身份不是一个人永远不变的标签，还要看他怎样表达自己、别人怎样回应。", english: "Identity is not a permanent label; examine how a person presents self and how others respond." },
+  sociolinguistics: { chinese: "不要只看到说法不同，还要看变化与对象、场合、群体或社会意义有什么关系。", english: "Do not stop at noticing difference; connect it to audience, setting, group, or social meaning." },
+  discourse: { chinese: "不要只看一句话的字面意思，还要看前后话语以及对方怎样回应。", english: "Do not rely only on literal meaning; examine surrounding talk and the listener’s response." },
+  sla: { chinese: "一次说对可能只是临时表现；真正的学习通常需要在之后的新任务中仍能使用。", english: "One correct response may be temporary performance; learning normally requires later use in a new task." },
+  policy: { chinese: "写在文件里的规定不等于实际做法，还要看教师和学生如何执行。", english: "A written rule is not the same as practice; examine how teachers and students enact it." },
+};
+
+const undergraduateTermContrasts: Record<string, { chinese: string; english: string }> = {
+  "E-language": { chinese: "这里看的是词典、句子和社会规范等外在对象；如果讨论个人头脑里的语言知识，则更接近 I-language。", english: "This concerns external objects such as dictionaries, utterances, and conventions; knowledge inside an individual mind is I-language." },
+  "I-language": { chinese: "这里看的是个人头脑中的语言知识；词典、语料库或社会规范属于 E-language 层面。", english: "This concerns linguistic knowledge in an individual mind; dictionaries, corpora, and social conventions belong to E-language." },
+  "Translanguaging": { chinese: "重点是学习者整合全部资源完成意义建构；若分析预先划定的两个语码之间如何交替，则更接近 code-switching。", english: "The focus is integrated meaning-making across the full repertoire; alternation between two pre-identified codes is closer to code-switching." },
+  "Code-switching": { chinese: "这里明确看见可识别语码之间的转换；跨语实践更强调说话者把全部资源作为整体来造义。", english: "Here the analysis identifies alternation between recognizable codes; translanguaging emphasizes integrated use of the whole repertoire." },
+  "Register": { chinese: "语域与反复出现的活动和关系相关；个人为了塑造形象而进行的具体选择更常称为风格。", english: "Register is associated with recurrent activity and relations; a speaker’s particular identity-oriented choice is more often discussed as style." },
+  "Style": { chinese: "风格强调说话者在具体场合中的选择；语域更强调某类活动通常使用的表达配置。", english: "Style emphasizes a speaker’s situated choice; register emphasizes the configuration conventionally associated with an activity." },
+  "Dialect": { chinese: "方言可能涉及词汇、语法和发音；如果差别主要在发音，通常称为口音。", english: "A dialect may differ in vocabulary, grammar, and pronunciation; a difference mainly in pronunciation is an accent." },
+  "Accent": { chinese: "口音主要指发音特点；包含词汇和语法差异的地域或社会变体更接近方言。", english: "Accent mainly concerns pronunciation; a variety differing also in vocabulary and grammar is closer to a dialect." },
+  "Prejudice": { chinese: "偏见是没有充分依据的负面判断；如果这种判断变成拒绝机会等行为，就属于歧视。", english: "Prejudice is an unsupported negative judgment; when it becomes unequal treatment, it is discrimination." },
+  "Discrimination": { chinese: "这里已经发生了不平等行为，不只是心里的负面看法。", english: "Unequal action has occurred here; this is more than a negative belief or attitude." },
+};
+
 function hash(value: string) {
   return Array.from(value).reduce((total, character) => (total * 31 + character.charCodeAt(0)) >>> 0, 7);
 }
@@ -343,6 +405,7 @@ export function buildConceptExample(
   entry: ExampleEntry,
   concept: ExampleConcept,
   englishDefinition: string,
+  level: ExampleLevel = "doctoral",
 ): ConceptExample {
   const frame = frames[concept.groupId] || defaultFrame;
   const sceneIndex = hash(concept.term) % frame.scenesZh.length;
@@ -350,6 +413,15 @@ export function buildConceptExample(
   const application = firstSentence(entry.fields.find((field) => field.label === "应用语言学用途")?.text || "", 92);
   const zhName = chineseTitle(entry.title);
   const applicationBridge = application ? `研究用途：${application}。` : "研究者随后用更多资料检查这一解释。";
+
+  if (level === "undergraduate") {
+    const scene = undergraduateTermScenes[concept.term] || undergraduateGroupScenes[concept.groupId] || undergraduateGroupScenes.sociolinguistics;
+    const contrast = undergraduateTermContrasts[concept.term] || undergraduateGroupContrasts[concept.groupId] || undergraduateGroupContrasts.sociolinguistics;
+    return {
+      chinese: `生活例子：${scene.chinese}。为什么：这个例子体现了“${zhName}（${concept.term}）”——${meaning}。别混淆：${contrast.chinese}`,
+      english: `Everyday example: ${scene.english}. Why it fits: this illustrates ${concept.term}—${englishSentence(englishDefinition, 220)} Key distinction: ${contrast.english}`,
+    };
+  }
 
   return {
     chinese: `情境：${frame.scenesZh[sceneIndex]}，关键片段呈现出以下现象或分析关系：${meaning}。判断：因此可用“${zhName}（${concept.term}）”解释这个片段。${applicationBridge}辨析：${frame.contrastZh}`,
