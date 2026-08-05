@@ -142,8 +142,24 @@ export const conceptGroups: ConceptGroup[] = [
       "Translation", "Translanguaging in translation", "Mutual embeddedness", "Consecutive interpreting", "Simultaneous interpreting",
       "Sign-language interpreting", "Subtitling", "Translation process", "Translation product", "Controlled equivocation",
       "Interculturality", "Transculturation", "Cross-cultural communication", "Intercultural communication", "Imagined community",
-      "Intersectionality", "Queer linguistics", "Queer theory", "Gender performativity", "Transraciality",
+      "Queer linguistics", "Queer theory", "Gender performativity", "Transraciality",
       "Radical listening", "Hard translanguaging", "Soft translanguaging", "Unequal Englishes", "Individualization"
+    ]
+  },
+  {
+    id: "handbook_topics",
+    label: "手册复合专题与理论争议",
+    color: "ochre",
+    terms: [
+      "Waterscape epistemologies / wet ontology", "Languaging as ritual", "Politics of meaning", "Transpositioning",
+      "Monolingual ideology / monolingual bias", "Linguistic erasure / delegitimization", "Hard vs soft translanguaging",
+      "Linguistic repertoire / idiolect", "Single-grammar thesis vs two-grammar assumption", "EMI and language-of-instruction policy",
+      "Language revitalization / reclamation", "Historically based language trauma", "Expansive languaging and dis/ability",
+      "Translanguaging Universal Design for Learning", "Critical translanguaging lens on assessment",
+      "Macroethics and microethics", "Visuality and the SEMIOSIS framework", "Translanguaging in the digital world",
+      "Translation vs translanguaging", "Translingualism / translingual practice", "Individualization and unequal Englishes",
+      "Networks of signification / unspeakable significance", "Creativity and criticality",
+      "Gender, sexuality and the “trans” in translanguaging", "Critical applied linguistics", "Named-language ontology", "Language transfer"
     ]
   },
   {

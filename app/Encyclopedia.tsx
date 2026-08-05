@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { allConcepts, conceptGroups } from "./concepts";
 import { sourceDefinitions } from "./sourceDefinitions";
 
@@ -19,10 +19,10 @@ const levelProfiles: { id: LearningLevel; label: string; eyebrow: string; descri
 ];
 
 const undergraduateGroups = new Set(["boundaries", "sociolinguistics", "discourse", "sla", "policy"]);
-const graduateGroups = new Set(["education", "literacy", "assessment", "testing", "cognition", "revitalization", "method", "methodology", "translation_ext", "technology_ext"]);
-const doctoralGroups = new Set(["foundations", "power", "praxis", "identity", "extensions"]);
-const undergraduateCore = new Set(["Translanguaging", "Languaging", "Multimodality", "Meaning-making", "Bilingualism", "Multilingualism", "Plurilingualism", "Code-switching", "Language ideology", "Communicative competence"]);
-const graduateResearchCore = new Set(["Ethnography", "Discourse analysis", "Conversation analysis", "Interactional sociolinguistics", "Corpus linguistics", "Case study", "Mixed methods", "Validity", "Reliability", "Reflexivity", "Positionality", "Triangulation"]);
+const graduateGroups = new Set(["education", "literacy", "assessment", "testing", "cognition", "revitalization", "method", "methodology", "translation_ext", "technology_ext", "extensions"]);
+const doctoralGroups = new Set(["foundations", "power", "praxis", "identity", "handbook_topics"]);
+const undergraduateCore = new Set(["Translanguaging", "Languaging", "Multimodality", "Meaning-making", "Bilingualism", "Multilingualism", "Plurilingualism", "Code-switching", "Language ideology", "Communicative competence", "Belonging", "Othering", "Stereotype", "Prejudice", "Discrimination"]);
+const graduateResearchCore = new Set(["Ethnography", "Discourse analysis", "Conversation analysis", "Interactional sociolinguistics", "Corpus linguistics", "Case study", "Mixed methods", "Validity", "Reliability", "Reflexivity", "Positionality", "Triangulation", "Informed consent", "Process consent", "Confidentiality", "Anonymity", "Authorship", "Intellectual property", "Transparency", "Narrative identity", "Passing", "Misrecognition", "In-betweenness", "Identity approach to SLA", "Usage-based learning", "Emergentism", "Complex dynamic systems theory", "Ecological approach to SLA"]);
 
 function levelForConcept(concept: { term: string; groupId: string }): LearningLevel {
   if (undergraduateCore.has(concept.term)) return "undergraduate";
@@ -43,6 +43,12 @@ function entryParts(title: string) {
 function matchingEntry(term: string, entries: DeepEntry[]) {
   const target = normalize(term);
   return entries.find((entry) => normalize(entryParts(entry.title).english) === target);
+}
+
+function sourceLabel(sourceType: string) {
+  if (sourceType === "Direct formulation") return "原书直接表述";
+  if (sourceType === "Bell sociolinguistics foundation") return "依据 Bell 改写的社会语言学定义";
+  return "百科综合改写（非原书原句）";
 }
 
 function parseMarkdown(markdown: string): DeepEntry[] {
@@ -68,23 +74,68 @@ export default function Encyclopedia() {
   const [deepEntries, setDeepEntries] = useState<DeepEntry[]>([]);
   const [selected, setSelected] = useState<DeepEntry | null>(null);
   const [isBrowsing, setIsBrowsing] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [copied, setCopied] = useState<"link" | "citation" | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     fetch("/encyclopedia.md")
-      .then((response) => response.text())
-      .then((text) => setDeepEntries(parseMarkdown(text)));
+      .then((response) => { if (!response.ok) throw new Error("load failed"); return response.text(); })
+      .then((text) => setDeepEntries(parseMarkdown(text)))
+      .catch(() => setLoadError(true));
   }, []);
+
+  useEffect(() => {
+    if (!deepEntries.length) return;
+    const syncFromUrl = () => {
+      const term = new URL(window.location.href).searchParams.get("concept");
+      setSelected(term ? matchingEntry(term, deepEntries) || null : null);
+    };
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => window.removeEventListener("popstate", syncFromUrl);
+  }, [deepEntries]);
+
+  useEffect(() => {
+    if (!selected) return;
+    closeButtonRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeConcept();
+      if (event.key === "Tab" && modalRef.current) {
+        const focusable = Array.from(modalRef.current.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter((element) => !element.hasAttribute("disabled"));
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selected]);
 
   const filtered = useMemo(() => {
     const needle = normalize(query);
     return allConcepts.filter((concept) => {
-      const bilingualTitle = matchingEntry(concept.term, deepEntries)?.title || "";
+      const entry = matchingEntry(concept.term, deepEntries);
+      const bilingualTitle = entry?.title || "";
+      const source = entry ? sourceDefinitions[entry.number] : undefined;
+      const searchableText = `${concept.term} ${bilingualTitle} ${concept.groupLabel} ${entry?.fields.map((field) => `${field.label} ${field.text}`).join(" ") || ""} ${source?.english || ""} ${source?.location || ""}`;
       const inGroup = group === "all" || concept.groupId === group;
       const inLevel = level === "all" || levelForConcept(concept) === level;
-      const inSearch = !needle || normalize(`${concept.term} ${bilingualTitle} ${concept.groupLabel}`).includes(needle);
+      const inSearch = !needle || normalize(searchableText).includes(needle);
       return inGroup && inLevel && inSearch;
     });
   }, [deepEntries, group, level, query]);
+
+  const relatedConcepts = useMemo(() => {
+    if (!selected) return [];
+    const selectedEnglish = entryParts(selected.title).english;
+    const indexed = allConcepts.find((concept) => normalize(concept.term) === normalize(selectedEnglish));
+    if (!indexed) return [];
+    return allConcepts.filter((concept) => concept.groupId === indexed.groupId && normalize(concept.term) !== normalize(indexed.term)).slice(0, 6);
+  }, [selected]);
 
   const chooseLevel = (next: LearningLevel) => {
     setIsBrowsing(true);
@@ -95,7 +146,34 @@ export default function Encyclopedia() {
 
   const openConcept = (term: string) => {
     const exact = matchingEntry(term, deepEntries);
-    if (exact) setSelected(exact);
+    if (exact) {
+      setSelected(exact);
+      setCopied(null);
+      const url = new URL(window.location.href);
+      url.searchParams.set("concept", entryParts(exact.title).english);
+      window.history.pushState({}, "", url);
+    }
+  };
+
+  const closeConcept = () => {
+    setSelected(null);
+    setCopied(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("concept");
+    window.history.pushState({}, "", url);
+  };
+
+  const copyConceptLink = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied("link");
+  };
+
+  const copyConceptCitation = async () => {
+    if (!selected) return;
+    const title = entryParts(selected.title);
+    const citation = `《应用语言学 × 社会语言学：超语概念百科》，“${title.english}（${title.chinese}）”，词条 ${selected.number}，${window.location.href}（访问日期：${new Date().toISOString().slice(0, 10)}）。`;
+    await navigator.clipboard.writeText(citation);
+    setCopied("citation");
   };
 
   const startBrowsing = () => {
@@ -176,7 +254,7 @@ export default function Encyclopedia() {
           {conceptGroups.map((item) => <button key={item.id} className={group === item.id ? "active" : ""} onClick={() => setGroup(item.id)}>{item.label}</button>)}
         </div></details>
         <div className="result-line">{filtered.length} 个概念 · {filtered.filter((concept) => Boolean(matchingEntry(concept.term, deepEntries))).length} 个可阅读全文</div>
-        {deepEntries.length === 0 ? <div className="empty">正在载入完整百科内容…</div> : <div className="concept-grid">
+        {loadError ? <div className="empty">百科内容暂时载入失败，请刷新页面重试。</div> : deepEntries.length === 0 ? <div className="empty">正在载入完整百科内容…</div> : <div className="concept-grid">
           {filtered.flatMap((concept) => {
             const entry = matchingEntry(concept.term, deepEntries);
             if (!entry) return [];
@@ -198,24 +276,29 @@ export default function Encyclopedia() {
       <section className="about" id="about">
         <details><summary>这部百科如何解释每个概念？</summary><p>每个完整词条依次说明：定义、问题来源、理论背景、学者谱系、应用、相近概念辨析、手册用法、历时变化、优势与批评，以及研究操作化。</p></details>
         <details><summary>内容依据是什么？</summary><p>以《The Handbook of Translanguaging》为主文献，以《The Handbook of Applied Linguistics》重建应用语言学背景，并以 Allan Bell 的《The Guidebook to Sociolinguistics》补足多语、语言接触、变异、互动、身份与社会意义等基础。它是一部概念百科，不是章节摘要。</p></details>
+        <details><summary>英文定义是不是原书原句？</summary><p>只有标为“原书直接表述”的定义可视为紧贴原书措辞；“依据手册综合改写”和“依据 Bell 改写”均为本百科为便于理解而作的英文综合定义，不应作为原书直接引文。引用论文时请回到所列章节或页码核对原文。</p></details>
+        <details><summary>“超语”“跨语实践”和“跨语用”是什么关系？</summary><p>网站标题使用较简洁的“超语”；词条正文以“跨语实践”为推荐分析译名，并保留“跨语用”这一常见异译。三者均以英文 Translanguaging 为检索锚点；涉及具体理论差异时以英文原词和词条辨析为准。</p></details>
+        <details><summary>核心参考文献</summary><p>Li Wei, Phyak, Lee 与 García 编《The Handbook of Translanguaging》（2025）；Davies 与 Elder 编《The Handbook of Applied Linguistics》（2004）；Allan Bell《The Guidebook to Sociolinguistics》（2014）。词条中的来源位置用于回查方向，不替代正式版本的页码核验。</p></details>
         <p className="quiet-stat">已编目 {allConcepts.length} 个概念 · 已完成 {deepEntries.length} 个十维深度词条</p>
       </section>
 
       <footer><span>应用语言学 × 社会语言学：超语概念百科</span><p>Evidence-controlled · Concept-led · Research-ready</p><a href="#top">回到顶部 ↑</a></footer>
 
       {selected && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
-          <article className="modal" role="dialog" aria-modal="true" aria-labelledby="entry-title" onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelected(null)} aria-label="关闭词条">×</button>
+        <div className="modal-backdrop" role="presentation" onMouseDown={closeConcept}>
+          <article ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="entry-title" onMouseDown={(event) => event.stopPropagation()}>
+            <button ref={closeButtonRef} className="modal-close" onClick={closeConcept} aria-label="关闭词条">×</button>
             <span className="entry-no">ENTRY {String(selected.number).padStart(3, "0")}</span>
             <div className="bilingual-heading" id="entry-title">
               <h2 lang="en">{entryParts(selected.title).english}</h2>
               <h3>{entryParts(selected.title).chinese}</h3>
             </div>
+            <div className="entry-actions"><button className="copy-link" onClick={copyConceptLink}>{copied === "link" ? "链接已复制" : "复制本词条链接"}</button><button className="copy-link" onClick={copyConceptCitation}>{copied === "citation" ? "引用已复制" : "复制中文引用"}</button></div>
             <aside className="translation-note"><b>译名说明</b><p>英文原词是稳定的检索锚点；中文部分呈现推荐译名及常见异译。斜线“／”表示并存译法，不表示它们在理论上完全等价。具体语义差异见下方“概念辨析”。</p></aside>
             <div className="entry-fields">
-              {selected.fields.map((field, index) => <section key={`${field.label}-${index}`}><b>{String(index + 1).padStart(2, "0")}</b><div><h3>{field.label}</h3><p>{field.text}</p>{index === 0 && sourceDefinitions[selected.number] && <div className="english-definition"><span>ENGLISH DEFINITION · {sourceDefinitions[selected.number].sourceType}</span><p lang="en">{sourceDefinitions[selected.number].english}</p><small>{sourceDefinitions[selected.number].location}</small></div>}</div></section>)}
+              {selected.fields.map((field, index) => <section key={`${field.label}-${index}`}><b>{String(index + 1).padStart(2, "0")}</b><div><h3>{field.label}</h3><p>{field.text}</p>{index === 0 && sourceDefinitions[selected.number] && <div className="english-definition"><span>ENGLISH DEFINITION · {sourceLabel(sourceDefinitions[selected.number].sourceType)}</span><p lang="en">{sourceDefinitions[selected.number].english}</p><small>{sourceDefinitions[selected.number].location}</small><em>来源类型已明确区分；综合改写不是可直接引用的原书引文。</em></div>}</div></section>)}
             </div>
+            {relatedConcepts.length > 0 && <section className="related-concepts"><span>同类概念</span><div>{relatedConcepts.map((concept) => <button key={`${concept.groupId}-${concept.term}`} onClick={() => openConcept(concept.term)}>{concept.term}</button>)}</div></section>}
           </article>
         </div>
       )}
