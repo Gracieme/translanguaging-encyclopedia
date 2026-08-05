@@ -145,13 +145,13 @@ export default function Encyclopedia() {
     }
   };
 
-  const closeConcept = () => {
+  function closeConcept() {
     setSelected(null);
     setCopied(null);
     const url = new URL(window.location.href);
     url.searchParams.delete("concept");
     window.history.pushState({}, "", url);
-  };
+  }
 
   const copyConceptLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
@@ -276,6 +276,7 @@ export default function Encyclopedia() {
 
       {selected && (
         <div className="modal-backdrop" role="presentation" onMouseDown={closeConcept}>
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
           <article ref={modalRef} className="modal" role="dialog" aria-modal="true" aria-labelledby="entry-title" onMouseDown={(event) => event.stopPropagation()}>
             <button ref={closeButtonRef} className="modal-close" onClick={closeConcept} aria-label="关闭词条">×</button>
             <span className="entry-no">ENTRY {String(selected.number).padStart(3, "0")}</span>
@@ -297,8 +298,7 @@ export default function Encyclopedia() {
                 if (!indexedConcept) return null;
                 const exampleLevel = levelForConcept(indexedConcept);
                 const example = buildConceptExample(selected, indexedConcept, sourceDefinitions[selected.number].english, exampleLevel);
-                const chineseLabel = exampleLevel === "undergraduate" ? "生活例子与简单解释" : exampleLevel === "graduate" ? "实际例子、概念解释与研究用法" : "例子、理论机制与研究方向";
-                return <section className="concept-example"><b>11</b><div><h3>例子 / Example</h3><div className="example-language"><span>{chineseLabel}</span><p className="sense-lines"><ChineseSenseText text={example.chinese} /></p></div><div className="example-language english-example"><span>ENGLISH EXAMPLE, EXPLANATION &amp; RESEARCH USE</span><p lang="en">{example.english}</p></div><small>本例由百科根据词条定义与应用场景编写，用于理解和概念辨析，不是原书案例或实证资料引文。</small></div></section>;
+                return <section className="concept-example"><b>11</b><div><h3>例子 / Example</h3><div className="example-language"><span>{example.kind}</span><p className="sense-lines"><ChineseSenseText text={example.chinese} /></p></div><div className="example-language english-example"><span>ENGLISH EXAMPLE</span><p lang="en">{example.english}</p></div><small>本例为百科编写的概念说明场景，不是原书案例或实证资料引文。</small></div></section>;
               })()}
             </div>
             {relatedConcepts.length > 0 && <section className="related-concepts"><span>同类概念</span><div>{relatedConcepts.map((concept) => <button key={`${concept.groupId}-${concept.term}`} onClick={() => openConcept(concept.term)}>{concept.term}</button>)}</div></section>}
