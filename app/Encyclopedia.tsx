@@ -97,7 +97,7 @@ export default function Encyclopedia() {
       <section className="lexicon" id="lexicon">
         <div className="section-heading">
           <div><span className="kicker">CONCEPT ATLAS</span><h2>概念地图</h2></div>
-          <p>350 个经筛选概念构成完整导航；带“深度”标记的词条已完成十项解释，其余词条按证据顺序继续扩写。</p>
+          <p>600 个经筛选概念构成完整导航；带“深度”标记的词条已完成十项解释，其余词条按证据顺序继续扩写。</p>
         </div>
         <div className="toolbar">
           <label className="search">
@@ -167,4 +167,3 @@ export default function Encyclopedia() {
     </main>
   );
 }
-

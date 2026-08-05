@@ -145,10 +145,129 @@ export const conceptGroups: ConceptGroup[] = [
       "Intersectionality", "Queer linguistics", "Queer theory", "Gender performativity", "Transraciality",
       "Radical listening", "Hard translanguaging", "Soft translanguaging", "Unequal Englishes", "Individualization"
     ]
+  },
+  {
+    id: "sociolinguistics",
+    label: "社会语言学基础",
+    color: "blue",
+    terms: [
+      "Speech community", "Community of practice", "Sociolinguistic competence", "Communicative competence", "Interactional competence",
+      "Heteroglossia", "Diglossia", "Enregisterment", "Indexicality", "Indexical order",
+      "Language ideology", "Standard language ideology", "Language attitude", "Prestige", "Stigma",
+      "Overt prestige", "Covert prestige", "Style-shifting", "Audience design", "Speaker design",
+      "Sociolinguistic variable", "Variation", "Social meaning", "Ethnolinguistic vitality", "Superdiversity"
+    ]
+  },
+  {
+    id: "discourse",
+    label: "话语、互动与语用",
+    color: "ochre",
+    terms: [
+      "Discourse", "Text", "Context", "Co-text", "Genre",
+      "Speech act", "Pragmatic competence", "Implicature", "Presupposition", "Deixis",
+      "Turn-taking", "Adjacency pair", "Preference organization", "Repair", "Other-initiated repair",
+      "Stance", "Positioning", "Footing", "Framing", "Contextualization cue",
+      "Metapragmatics", "Entextualization", "Recontextualization", "Intertextuality", "Chronotope"
+    ]
+  },
+  {
+    id: "sla",
+    label: "二语习得与学习理论",
+    color: "green",
+    terms: [
+      "Interlanguage", "Transfer", "Crosslinguistic influence", "Fossilization", "Noticing hypothesis",
+      "Input hypothesis", "Output hypothesis", "Interaction hypothesis", "Sociocultural theory", "Zone of proximal development",
+      "Mediation", "Internalization", "Private speech", "Language socialization", "Investment",
+      "Motivation", "Willingness to communicate", "Learner autonomy", "Agency", "Identity approach to SLA",
+      "Usage-based learning", "Emergentism", "Complex dynamic systems theory", "Affordance", "Ecological approach to SLA"
+    ]
+  },
+  {
+    id: "policy",
+    label: "语言政策、规划与权利",
+    color: "red",
+    terms: [
+      "Language policy", "Language planning", "Status planning", "Corpus planning", "Acquisition planning",
+      "Prestige planning", "Language management", "Language practice", "Language belief", "De facto language policy",
+      "De jure language policy", "Official language", "National language", "Language rights", "Linguistic human rights",
+      "Minority language", "Minoritized language", "Heritage language", "Indigenous language", "Endangered language",
+      "Language maintenance", "Language shift", "Reversing language shift", "Family language policy", "Medium-of-instruction policy"
+    ]
+  },
+  {
+    id: "revitalization",
+    label: "复振、社群与历史修复",
+    color: "teal",
+    terms: [
+      "Language reclamation", "Language documentation", "Language nest", "New speaker", "Intergenerational transmission",
+      "Domain expansion", "Language vitality", "Ethnolinguistic sustainability", "Rematriation", "Repatriation of knowledge",
+      "Historical trauma", "Intergenerational trauma", "Trauma-informed pedagogy", "Healing-centered engagement", "Language shame",
+      "Language loyalty", "Ancestral language learning", "Community language school", "Supplementary school", "Community cultural institution",
+      "Participatory language planning", "Grassroots language policy", "Indigenous methodology", "Relational accountability", "Data sovereignty"
+    ]
+  },
+  {
+    id: "testing",
+    label: "测试、测量与研究质量",
+    color: "amber",
+    terms: [
+      "Reliability", "Measurement error", "Test bias", "Differential item functioning", "Measurement invariance",
+      "Washback", "Test impact", "High-stakes testing", "Language test literacy", "Assessment literacy",
+      "Construct underrepresentation", "Construct-irrelevant variance", "Authentic assessment", "Portfolio assessment", "Performance assessment",
+      "Alternative assessment", "Self-assessment", "Peer assessment", "Translanguaging assessment", "Multilingual assessment",
+      "Generalizability", "Transferability", "Credibility in qualitative research", "Dependability", "Confirmability"
+    ]
+  },
+  {
+    id: "methodology",
+    label: "方法论、证据与开放研究",
+    color: "slate",
+    terms: [
+      "Ontology", "Epistemology", "Axiology", "Methodology", "Reflexivity",
+      "Positionality", "Emic perspective", "Etic perspective", "Thick description", "Triangulation",
+      "Member reflection", "Negative case analysis", "Saturation", "Theoretical sampling", "Purposive sampling",
+      "Convenience sampling", "Observer's paradox", "Reactivity", "Researcher effect", "Ecological validity",
+      "Preregistration", "Open data", "Data ethics", "Reproducibility", "Replicability"
+    ]
+  },
+  {
+    id: "translation_ext",
+    label: "翻译、口译与跨语言中介",
+    color: "violet",
+    terms: [
+      "Equivalence", "Dynamic equivalence", "Formal equivalence", "Skopos theory", "Domestication",
+      "Foreignization", "Translator visibility", "Translation norm", "Translation brief", "Source text",
+      "Target text", "Interpreting aptitude", "Community interpreting", "Public-service interpreting", "Medical interpreting",
+      "Court interpreting", "Educational interpreting", "Relay interpreting", "Sight translation", "Audio description",
+      "Machine translation", "Post-editing", "Transcreation", "Localization", "Multimodal translation"
+    ]
+  },
+  {
+    id: "identity",
+    label: "身份、文化与交叉性",
+    color: "pink",
+    terms: [
+      "Identity", "Subjectivity", "Performativity", "Intersectionality", "Positioned identity",
+      "Narrative identity", "Transnational identity", "Diasporic identity", "Hybrid identity", "Liminality",
+      "In-betweenness", "Passing", "Authenticity discourse", "Belonging", "Recognition",
+      "Misrecognition", "Othering", "Stereotype", "Prejudice", "Discrimination",
+      "Accentism", "Linguicism", "Gendered language", "Queer temporality", "Transracial identification"
+    ]
+  },
+  {
+    id: "technology_ext",
+    label: "数字平台、人工智能与媒介",
+    color: "indigo",
+    terms: [
+      "Computer-assisted language learning", "Mobile-assisted language learning", "Technology-mediated communication", "Computer-mediated discourse", "Digital multimodality",
+      "Platformization", "Algorithmic bias", "Algorithmic language ideology", "Content moderation", "Automated translation",
+      "Large language model", "Language-agnostic AI", "Natural language processing", "Speech recognition", "Automatic captioning",
+      "Digital divide", "Datafication", "Surveillance", "Digital labor", "Platform vernacular",
+      "Participatory culture", "Networked public", "Context collapse", "Memetic communication", "Human-AI co-writing"
+    ]
   }
 ];
 
 export const allConcepts = conceptGroups.flatMap((group) =>
   group.terms.map((term) => ({ term, groupId: group.id, groupLabel: group.label, color: group.color }))
 );
-
