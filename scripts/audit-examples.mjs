@@ -36,6 +36,8 @@ for (const concept of allConcepts) {
   if (example.chinese.length < (level === "undergraduate" ? 95 : 150)) failures.push(`Chinese example too short: ${concept.term}`);
   if (example.english.length < (level === "undergraduate" ? 160 : 180)) failures.push(`English example too short: ${concept.term}`);
   if (level === "undergraduate" && /研究者|分析者|关键片段|分析关系/.test(example.chinese.split("为什么：")[0])) failures.push(`Undergraduate example is too research-oriented: ${concept.term}`);
+  if (level === "graduate" && !["实际例子：", "这是什么：", "怎样研究：", "别混淆："].every((label) => example.chinese.includes(label))) failures.push(`Graduate example lacks teaching structure: ${concept.term}`);
+  if (level === "doctoral" && !["先用例子理解：", "它是什么：", "研究方向：", "理论边界："].every((label) => example.chinese.includes(label))) failures.push(`Doctoral example lacks teaching structure: ${concept.term}`);
 }
 
 const groupIds = new Set(conceptGroups.map((group) => group.id));
