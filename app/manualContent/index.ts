@@ -15,6 +15,7 @@ import { discourseContent } from "./discourse.ts";
 import { slaContent } from "./sla.ts";
 import { policyContent } from "./policy.ts";
 import { revitalizationContent } from "./revitalization.ts";
+import { testingContent } from "./testing.ts";
 import type { ManualConceptContent } from "./types.ts";
 
 export const manualConceptContent: Record<string, ManualConceptContent> = {
@@ -35,4 +36,5 @@ export const manualConceptContent: Record<string, ManualConceptContent> = {
   ...slaContent,
   ...policyContent,
   ...revitalizationContent,
+  ...testingContent,
 };
