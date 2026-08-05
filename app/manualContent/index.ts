@@ -10,6 +10,7 @@ import { methodContent } from "./method.ts";
 import { extensionsContent } from "./extensions.ts";
 import { handbookTopicsContent } from "./handbookTopics.ts";
 import { sociolinguisticsAContent } from "./sociolinguisticsA.ts";
+import { sociolinguisticsBContent } from "./sociolinguisticsB.ts";
 import type { ManualConceptContent } from "./types.ts";
 
 export const manualConceptContent: Record<string, ManualConceptContent> = {
@@ -25,4 +26,5 @@ export const manualConceptContent: Record<string, ManualConceptContent> = {
   ...extensionsContent,
   ...handbookTopicsContent,
   ...sociolinguisticsAContent,
+  ...sociolinguisticsBContent,
 };
