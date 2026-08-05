@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { allConcepts, conceptGroups } from "./concepts";
-import { buildConceptExample } from "./conceptExamples";
+import { buildConceptExample, buildPlainChinese } from "./conceptExamples";
 import { levelForConcept, levelProfiles, type LearningLevel } from "./learningLevels";
 import { sourceDefinitions } from "./sourceDefinitions";
 
@@ -44,6 +44,15 @@ function parseMarkdown(markdown: string): DeepEntry[] {
     entries.push({ number: Number(match[1]), title: match[2], fields });
   }
   return entries;
+}
+
+function chineseSenseUnits(text: string) {
+  const marked = text.replace(/(生活例子：|为什么：|别混淆：|实际例子：|这是什么：|怎样研究：|先用例子理解：|研究方向：|理论边界：)/g, "\n$1");
+  return marked.split(/\n|(?<=[。！？；])/).map((unit) => unit.trim()).filter(Boolean);
+}
+
+function ChineseSenseText({ text }: { text: string }) {
+  return <>{chineseSenseUnits(text).map((unit, index) => <span key={`${index}-${unit.slice(0, 12)}`}>{unit}</span>)}</>;
 }
 
 export default function Encyclopedia() {
@@ -101,7 +110,8 @@ export default function Encyclopedia() {
       const bilingualTitle = entry?.title || "";
       const source = entry ? sourceDefinitions[entry.number] : undefined;
       const example = entry && source ? buildConceptExample(entry, concept, source.english, levelForConcept(concept)) : undefined;
-      const searchableText = `${concept.term} ${bilingualTitle} ${concept.groupLabel} ${entry?.fields.map((field) => `${field.label} ${field.text}`).join(" ") || ""} ${source?.english || ""} ${source?.location || ""} ${example?.chinese || ""} ${example?.english || ""}`;
+      const plainChinese = entry ? buildPlainChinese(entry, concept, levelForConcept(concept)) : "";
+      const searchableText = `${concept.term} ${bilingualTitle} ${concept.groupLabel} ${plainChinese} ${entry?.fields.map((field) => `${field.label} ${field.text}`).join(" ") || ""} ${source?.english || ""} ${source?.location || ""} ${example?.chinese || ""} ${example?.english || ""}`;
       const inGroup = group === "all" || concept.groupId === group;
       const inLevel = level === "all" || levelForConcept(concept) === level;
       const inSearch = !needle || normalize(searchableText).includes(needle);
@@ -273,17 +283,22 @@ export default function Encyclopedia() {
               <h2 lang="en">{entryParts(selected.title).english}</h2>
               <h3>{entryParts(selected.title).chinese}</h3>
             </div>
+            {(() => {
+              const indexedConcept = allConcepts.find((concept) => normalize(concept.term) === normalize(entryParts(selected.title).english));
+              if (!indexedConcept) return null;
+              return <aside className="plain-chinese"><b>一句话说人话</b><p className="sense-lines"><ChineseSenseText text={buildPlainChinese(selected, indexedConcept, levelForConcept(indexedConcept))} /></p></aside>;
+            })()}
             <div className="entry-actions"><button className="copy-link" onClick={copyConceptLink}>{copied === "link" ? "链接已复制" : "复制本词条链接"}</button><button className="copy-link" onClick={copyConceptCitation}>{copied === "citation" ? "引用已复制" : "复制中文引用"}</button></div>
             <aside className="translation-note"><b>译名说明</b><p>英文原词是稳定的检索锚点；中文部分呈现推荐译名及常见异译。斜线“／”表示并存译法，不表示它们在理论上完全等价。具体语义差异见下方“概念辨析”。</p></aside>
             <div className="entry-fields">
-              {selected.fields.map((field, index) => <section key={`${field.label}-${index}`}><b>{String(index + 1).padStart(2, "0")}</b><div><h3>{field.label}</h3><p>{field.text}</p>{index === 0 && sourceDefinitions[selected.number] && <div className="english-definition"><span>ENGLISH DEFINITION · {sourceLabel(sourceDefinitions[selected.number].sourceType)}</span><p lang="en">{sourceDefinitions[selected.number].english}</p><small>{sourceDefinitions[selected.number].location}</small><em>来源类型已明确区分；综合改写不是可直接引用的原书引文。</em></div>}</div></section>)}
+              {selected.fields.map((field, index) => <section key={`${field.label}-${index}`}><b>{String(index + 1).padStart(2, "0")}</b><div><h3>{field.label}</h3><p className="sense-lines"><ChineseSenseText text={field.text} /></p>{index === 0 && sourceDefinitions[selected.number] && <div className="english-definition"><span>ENGLISH DEFINITION · {sourceLabel(sourceDefinitions[selected.number].sourceType)}</span><p lang="en">{sourceDefinitions[selected.number].english}</p><small>{sourceDefinitions[selected.number].location}</small><em>来源类型已明确区分；综合改写不是可直接引用的原书引文。</em></div>}</div></section>)}
               {sourceDefinitions[selected.number] && (() => {
                 const indexedConcept = allConcepts.find((concept) => normalize(concept.term) === normalize(entryParts(selected.title).english));
                 if (!indexedConcept) return null;
                 const exampleLevel = levelForConcept(indexedConcept);
                 const example = buildConceptExample(selected, indexedConcept, sourceDefinitions[selected.number].english, exampleLevel);
                 const chineseLabel = exampleLevel === "undergraduate" ? "生活例子与简单解释" : exampleLevel === "graduate" ? "实际例子、概念解释与研究用法" : "例子、理论机制与研究方向";
-                return <section className="concept-example"><b>11</b><div><h3>例子 / Example</h3><div className="example-language"><span>{chineseLabel}</span><p>{example.chinese}</p></div><div className="example-language english-example"><span>ENGLISH EXAMPLE, EXPLANATION &amp; RESEARCH USE</span><p lang="en">{example.english}</p></div><small>本例由百科根据词条定义与应用场景编写，用于理解和概念辨析，不是原书案例或实证资料引文。</small></div></section>;
+                return <section className="concept-example"><b>11</b><div><h3>例子 / Example</h3><div className="example-language"><span>{chineseLabel}</span><p className="sense-lines"><ChineseSenseText text={example.chinese} /></p></div><div className="example-language english-example"><span>ENGLISH EXAMPLE, EXPLANATION &amp; RESEARCH USE</span><p lang="en">{example.english}</p></div><small>本例由百科根据词条定义与应用场景编写，用于理解和概念辨析，不是原书案例或实证资料引文。</small></div></section>;
               })()}
             </div>
             {relatedConcepts.length > 0 && <section className="related-concepts"><span>同类概念</span><div>{relatedConcepts.map((concept) => <button key={`${concept.groupId}-${concept.term}`} onClick={() => openConcept(concept.term)}>{concept.term}</button>)}</div></section>}

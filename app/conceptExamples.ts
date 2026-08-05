@@ -383,6 +383,40 @@ const undergraduateTermContrasts: Record<string, { chinese: string; english: str
   "Discrimination": { chinese: "这里已经发生了不平等行为，不只是心里的负面看法。", english: "Unequal action has occurred here; this is more than a negative belief or attitude." },
 };
 
+const plainChineseOverrides: Record<string, string> = {
+  "Validity": "这个测验分数，真的能支持我们想得出的结论吗？",
+  "Reliability": "同样的能力再测一次、换个人评分，结果会不会大致保持一致？",
+  "Construct validity": "题目测到的，真的是它声称要测的那种能力吗？",
+  "Consequential validity": "使用这个测验结果，会给学习者和社会带来什么后果？",
+  "Fairness": "不同背景的人参加同一测评时，有没有公平展示能力的机会？",
+  "E-language": "把语言看成词典、语法书、语料和社会习惯等可以在头脑之外观察的东西。",
+  "I-language": "把语言看成一个人头脑中形成的语言知识和规则系统。",
+  "Ontology": "它在问：我们研究的东西究竟是什么、以什么方式存在？",
+  "Epistemology": "它在问：我们凭什么知道一件事，以及什么才能算可靠知识？",
+  "Axiology": "它在问：研究中哪些价值值得重视，价值判断怎样影响研究？",
+  "Methodology": "它在说明：基于怎样的知识观，我们为什么选择这一整套研究办法？",
+  "Positionality": "研究者是谁、站在什么社会位置，会怎样影响他看到和解释的东西？",
+  "Researcher positionality": "研究者的身份、经历和权力位置，会怎样影响进入现场以及解释资料？",
+  "Reflexivity": "研究者不断回头检查：自己的立场和做法是否正在影响研究结果。",
+  "Intersectionality": "一个人同时受到性别、种族、阶级等多种关系影响，这些关系不能拆开单独理解。",
+  "Decoloniality": "不再把殖民者的知识和语言标准当成唯一正确答案，并重新承认被压低的知识。",
+  "Raciolinguistics": "它研究人们怎样因为种族化眼光，把某些说话者听成‘语言不好’。",
+  "Assemblage": "人、语言、身体、物品、情感和制度临时连接起来，一起让事情发生。",
+  "New materialism": "物品、身体和环境不只是背景，它们也会参与行动和意义形成。",
+  "Posthumanism": "不要把人当成一切行动的唯一中心；工具、动物、环境和技术也参与其中。",
+  "Onto-epistemology": "我们认为什么东西存在，会直接影响我们怎样认识它；‘存在’和‘知道’分不开。",
+  "Translanguaging": "人会把自己会的语言、图像、手势和经验一起调动起来理解和表达，而不是在几个语言盒子间机械切换。",
+  "Code-switching": "说话时从一个可识别的语言或变体转换到另一个。",
+  "Language ideology": "人们关于哪种语言更正确、更高级或更合适的一套社会信念。",
+  "Communicative competence": "不只要把句子说对，还要知道在什么场合、对什么人应该怎样说。",
+  "Multimodality": "说话、文字、图像、声音、动作等多种方式一起传递意义。",
+  "Performativity": "身份不是只藏在心里，而是在一次次说话和行动中被做出来的。",
+  "Triangulation": "用不同资料、方法或研究者相互核对，看看结论是否站得住。",
+  "Ethnography": "研究者长期进入一个群体的日常生活，从成员的角度理解他们怎样生活和赋予意义。",
+  "Discourse analysis": "研究语言和文本怎样组织意义、身份、关系与权力，而不只检查单个句子的语法。",
+  "Conversation analysis": "逐轮查看人们怎样接话、停顿和修正，从而共同完成一次互动。",
+};
+
 const researchDirections: Record<string, { graduateZh: string; graduateEn: string; doctoralZh: string; doctoralEn: string }> = {
   foundations: { graduateZh: "可用课堂录像和多模态转写，追踪语言、身体与物质环境怎样共同形成意义。", graduateEn: "Use classroom video and multimodal transcription to trace how language, bodies, and material settings jointly produce meaning.", doctoralZh: "可进一步追问：若意义是关系性生成的，研究的分析单位和‘语言’本体应怎样重新界定？", doctoralEn: "Ask how a relational account of meaning requires the unit of analysis and the ontology of ‘language’ to be redefined." },
   boundaries: { graduateZh: "可比较制度使用的语言名称、参与者自我描述和实际互动资源，看三者边界是否一致。", graduateEn: "Compare institutional language labels, participants’ self-descriptions, and resources used in interaction to test whether their boundaries align.", doctoralZh: "可进一步追问：命名语言的边界是谁建立的，它在何种条件下成为心理事实、社会事实或治理工具？", doctoralEn: "Ask who constructs named-language boundaries and when they operate as psychological facts, social facts, or instruments of governance." },
@@ -423,6 +457,15 @@ function englishSentence(text: string, maxLength = 300) {
 
 function chineseTitle(title: string) {
   return title.match(/^.+?（(.+)）$/)?.[1]?.trim() || "该概念";
+}
+
+export function buildPlainChinese(entry: ExampleEntry, concept: ExampleConcept, level: ExampleLevel): string {
+  const override = plainChineseOverrides[concept.term];
+  if (override) return override;
+  const meaning = firstSentence(entry.fields.find((field) => field.label === "含义")?.text || entry.fields[0]?.text || "", level === "undergraduate" ? 88 : 105);
+  if (level === "undergraduate") return `简单说，这个词描述的是：${meaning}。`;
+  if (level === "graduate") return `简单说，这个概念帮助我们识别和研究：${meaning}。`;
+  return `简单说，它试图解释表面现象背后的这层机制：${meaning}。`;
 }
 
 export function buildConceptExample(
