@@ -18,6 +18,8 @@ import { revitalizationContent } from "./revitalization.ts";
 import { testingContent } from "./testing.ts";
 import { methodologyContent } from "./methodology.ts";
 import { translationExtContent } from "./translationExt.ts";
+import { identityContent } from "./identity.ts";
+import { technologyExtContent } from "./technologyExt.ts";
 import type { ManualConceptContent } from "./types.ts";
 
 export const manualConceptContent: Record<string, ManualConceptContent> = {
@@ -41,4 +43,6 @@ export const manualConceptContent: Record<string, ManualConceptContent> = {
   ...testingContent,
   ...methodologyContent,
   ...translationExtContent,
+  ...identityContent,
+  ...technologyExtContent,
 };
