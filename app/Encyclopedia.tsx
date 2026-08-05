@@ -9,6 +9,24 @@ type DeepEntry = {
   fields: { label: string; text: string }[];
 };
 
+type LearningLevel = "undergraduate" | "graduate" | "doctoral";
+
+const levelProfiles: { id: LearningLevel; label: string; eyebrow: string; description: string; outcome: string }[] = [
+  { id: "undergraduate", label: "本科生基础", eyebrow: "先建立共同语言", description: "核心术语、经典区分与应用语言学常识。", outcome: "适合入门、课程预习与建立概念框架" },
+  { id: "graduate", label: "研究生进阶", eyebrow: "开始比较与应用", description: "理论流派、课堂实践、研究方法与分析工具。", outcome: "适合文献综述、课程论文与研究设计" },
+  { id: "doctoral", label: "博士生研究", eyebrow: "进入争议与原创研究", description: "本体论、认识论、殖民性、批判谱系与方法论边界。", outcome: "适合开题、理论建构与可审查的学术论证" },
+];
+
+const undergraduateGroups = new Set(["boundaries", "sociolinguistics", "discourse", "sla", "policy"]);
+const graduateGroups = new Set(["education", "literacy", "assessment", "testing", "cognition", "revitalization", "method"]);
+const undergraduateCore = new Set(["Translanguaging", "Languaging", "Multimodality", "Meaning-making", "Bilingualism", "Multilingualism", "Plurilingualism", "Code-switching", "Language ideology", "Communicative competence"]);
+
+function levelForConcept(concept: { term: string; groupId: string }): LearningLevel {
+  if (undergraduateCore.has(concept.term) || undergraduateGroups.has(concept.groupId)) return "undergraduate";
+  if (graduateGroups.has(concept.groupId)) return "graduate";
+  return "doctoral";
+}
+
 const normalize = (value: string) => value.toLowerCase().replace(/[（）()／/–—-]/g, " ").replace(/\s+/g, " ").trim();
 
 function parseMarkdown(markdown: string): DeepEntry[] {
@@ -30,6 +48,7 @@ function parseMarkdown(markdown: string): DeepEntry[] {
 export default function Encyclopedia() {
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState("all");
+  const [level, setLevel] = useState<LearningLevel | "all">("all");
   const [deepEntries, setDeepEntries] = useState<DeepEntry[]>([]);
   const [selected, setSelected] = useState<DeepEntry | null>(null);
 
@@ -44,10 +63,17 @@ export default function Encyclopedia() {
     const needle = normalize(query);
     return allConcepts.filter((concept) => {
       const inGroup = group === "all" || concept.groupId === group;
+      const inLevel = level === "all" || levelForConcept(concept) === level;
       const inSearch = !needle || normalize(`${concept.term} ${concept.groupLabel}`).includes(needle);
-      return inGroup && inSearch;
+      return inGroup && inLevel && inSearch;
     });
-  }, [group, query]);
+  }, [group, level, query]);
+
+  const chooseLevel = (next: LearningLevel) => {
+    setLevel(next);
+    setGroup("all");
+    document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const openConcept = (term: string) => {
     const target = normalize(term);
@@ -66,38 +92,38 @@ export default function Encyclopedia() {
           <span>跨语实践概念百科</span>
         </a>
         <nav aria-label="主要导航">
-          <a href="#lexicon">概念库</a>
-          <a href="#method">研究工具</a>
-          <a href="#sources">文献依据</a>
+          <a href="#paths">学习路径</a>
+          <a href="#lexicon">查概念</a>
+          <a href="#about">关于</a>
         </nav>
       </header>
 
       <section className="hero" id="top">
-        <div className="eyebrow">Doctoral Encyclopedia · 2026 Edition</div>
-        <h1>语言从来不是<br /><em>一座座孤岛。</em></h1>
-        <p className="lede">以《The Handbook of Translanguaging》为主文献、以《The Handbook of Applied Linguistics》为学科背景的中文研究型百科。</p>
-        <div className="hero-stats" aria-label="百科统计">
-          <div><strong>{allConcepts.length}</strong><span>概念已编目</span></div>
-          <div><strong>{deepEntries.length || 50}</strong><span>十维深度词条</span></div>
-          <div><strong>33</strong><span>主手册章节</span></div>
-          <div><strong>10</strong><span>分析维度</span></div>
-        </div>
-        <a className="primary-link" href="#lexicon">开始探索 <span>↓</span></a>
+        <div className="eyebrow">Translanguaging · Applied Linguistics</div>
+        <h1>从你现在的阶段，<br /><em>开始理解语言。</em></h1>
+        <p className="lede">一部按学习阶段组织的中文概念百科。先选路径，再读概念。</p>
+        <label className="hero-search">
+          <span aria-hidden="true">⌕</span>
+          <input value={query} onChange={(event) => setQuery(event.target.value)} onFocus={() => document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" })} placeholder="搜索一个概念，例如 Translanguaging…" aria-label="搜索概念" />
+        </label>
       </section>
 
-      <section className="principle">
-        <p>不是章节摘要</p>
-        <h2>从“这是什么”一直追问到<br />“如何把它变成可审查的研究”。</h2>
-        <ol>
-          <li>清晰定义</li><li>问题来源</li><li>理论背景</li><li>学者谱系</li><li>应用语言学用途</li>
-          <li>相近概念辨析</li><li>本手册用法</li><li>历时变化</li><li>优势与批评</li><li>研究操作化</li>
-        </ol>
+      <section className="paths" id="paths">
+        <div className="simple-heading"><span>选择学习路径</span><h2>你现在需要知道到哪一步？</h2></div>
+        <div className="path-grid">
+          {levelProfiles.map((item, index) => {
+            const count = allConcepts.filter((concept) => levelForConcept(concept) === item.id).length;
+            return <button key={item.id} className={`path-card path-${item.id}`} onClick={() => chooseLevel(item.id)}>
+              <span className="path-number">0{index + 1}</span><small>{item.eyebrow}</small><h3>{item.label}</h3><p>{item.description}</p><em>{item.outcome}</em><b>{count} 个概念 →</b>
+            </button>;
+          })}
+        </div>
       </section>
 
       <section className="lexicon" id="lexicon">
         <div className="section-heading">
-          <div><span className="kicker">CONCEPT ATLAS</span><h2>概念地图</h2></div>
-          <p>600 个经筛选概念构成完整导航；带“深度”标记的词条已完成十项解释，其余词条按证据顺序继续扩写。</p>
+          <div><span className="kicker">CONCEPT LIBRARY</span><h2>{level === "all" ? "全部概念" : levelProfiles.find((item) => item.id === level)?.label}</h2></div>
+          <button className="reset-link" onClick={() => { setLevel("all"); setGroup("all"); setQuery(""); }}>清除筛选</button>
         </div>
         <div className="toolbar">
           <label className="search">
@@ -109,13 +135,15 @@ export default function Encyclopedia() {
             {conceptGroups.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
           </select>
         </div>
-        <div className="filter-row" aria-label="概念类别">
-          <button className={group === "all" ? "active" : ""} onClick={() => setGroup("all")}>全部 <b>{allConcepts.length}</b></button>
-          {conceptGroups.map((item) => (
-            <button key={item.id} className={group === item.id ? "active" : ""} onClick={() => setGroup(item.id)}>{item.label} <b>{item.terms.length}</b></button>
-          ))}
+        <div className="level-tabs" aria-label="学习阶段">
+          <button className={level === "all" ? "active" : ""} onClick={() => setLevel("all")}>全部</button>
+          {levelProfiles.map((item) => <button key={item.id} className={level === item.id ? "active" : ""} onClick={() => setLevel(item.id)}>{item.label}</button>)}
         </div>
-        <div className="result-line">显示 {filtered.length} 个概念</div>
+        <details className="advanced-filter"><summary>更多学科分类</summary><div className="filter-row" aria-label="概念类别">
+          <button className={group === "all" ? "active" : ""} onClick={() => setGroup("all")}>全部</button>
+          {conceptGroups.map((item) => <button key={item.id} className={group === item.id ? "active" : ""} onClick={() => setGroup(item.id)}>{item.label}</button>)}
+        </div></details>
+        <div className="result-line">{filtered.length} 个概念 · 其中 {filtered.filter((concept) => [...deepIndex].some((title) => title.startsWith(normalize(concept.term)) || normalize(concept.term).startsWith(title))).length} 个可阅读全文</div>
         <div className="concept-grid">
           {filtered.map((concept) => {
             const deep = [...deepIndex].some((title) => title.startsWith(normalize(concept.term)) || normalize(concept.term).startsWith(title));
@@ -132,22 +160,10 @@ export default function Encyclopedia() {
         {filtered.length === 0 && <div className="empty">没有匹配概念。尝试缩短关键词或切换类别。</div>}
       </section>
 
-      <section className="method" id="method">
-        <span className="kicker">RESEARCH DISCIPLINE</span>
-        <h2>六级证据阶梯</h2>
-        <p>跨语资源“出现”并不自动证明抵抗、去殖民或结构转化。网站把每项研究主张放回它真正能够支持的证据层级。</p>
-        <div className="ladder">
-          {["出现：资源并置", "功能：完成行动", "参与者意义", "机制与反例", "可观察后果", "持续结构转化"].map((item, index) => <div key={item}><b>0{index + 1}</b><span>{item}</span></div>)}
-        </div>
-      </section>
-
-      <section className="sources" id="sources">
-        <div>
-          <span className="kicker">SOURCE CONTROL</span>
-          <h2>两部手册，<br />不同责任。</h2>
-        </div>
-        <article><b>PRIMARY · 2026</b><h3>The Handbook of Translanguaging</h3><p>用于确定概念在本手册中的定义、争议、章节位置与研究扩展。文件名虽标作 2025，书内版权页与 CIP 均为 2026。</p></article>
-        <article><b>BACKGROUND · 2004</b><h3>The Handbook of Applied Linguistics</h3><p>用于重建跨语理论出现前的学科背景，不被倒写成早期 translanguaging 文献。</p></article>
+      <section className="about" id="about">
+        <details><summary>这部百科如何解释每个概念？</summary><p>每个完整词条依次说明：定义、问题来源、理论背景、学者谱系、应用、相近概念辨析、手册用法、历时变化、优势与批评，以及研究操作化。</p></details>
+        <details><summary>内容依据是什么？</summary><p>以《The Handbook of Translanguaging》为主文献，以《The Handbook of Applied Linguistics》重建学科背景；它是一部概念百科，不是章节摘要。</p></details>
+        <p className="quiet-stat">已编目 {allConcepts.length} 个概念 · 已完成 {deepEntries.length} 个十维深度词条</p>
       </section>
 
       <footer><span>跨语实践概念百科</span><p>Evidence-controlled · Concept-led · Research-ready</p><a href="#top">回到顶部 ↑</a></footer>
