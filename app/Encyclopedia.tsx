@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { allConcepts, conceptGroups } from "./concepts";
+import { sourceDefinitions } from "./sourceDefinitions";
 
 type DeepEntry = {
   number: number;
@@ -192,7 +193,7 @@ export default function Encyclopedia() {
             </div>
             <aside className="translation-note"><b>译名说明</b><p>英文原词是稳定的检索锚点；中文部分呈现推荐译名及常见异译。斜线“／”表示并存译法，不表示它们在理论上完全等价。具体语义差异见下方“概念辨析”。</p></aside>
             <div className="entry-fields">
-              {selected.fields.map((field, index) => <section key={`${field.label}-${index}`}><b>{String(index + 1).padStart(2, "0")}</b><div><h3>{field.label}</h3><p>{field.text}</p></div></section>)}
+              {selected.fields.map((field, index) => <section key={`${field.label}-${index}`}><b>{String(index + 1).padStart(2, "0")}</b><div><h3>{field.label}</h3><p>{field.text}</p>{index === 0 && sourceDefinitions[selected.number] && <div className="english-definition"><span>ENGLISH DEFINITION · {sourceDefinitions[selected.number].sourceType}</span><p lang="en">{sourceDefinitions[selected.number].english}</p><small>{sourceDefinitions[selected.number].location}</small></div>}</div></section>)}
             </div>
           </article>
         </div>
