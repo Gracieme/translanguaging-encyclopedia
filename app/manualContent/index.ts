@@ -16,6 +16,7 @@ import { slaContent } from "./sla.ts";
 import { policyContent } from "./policy.ts";
 import { revitalizationContent } from "./revitalization.ts";
 import { testingContent } from "./testing.ts";
+import { methodologyContent } from "./methodology.ts";
 import type { ManualConceptContent } from "./types.ts";
 
 export const manualConceptContent: Record<string, ManualConceptContent> = {
@@ -37,4 +38,5 @@ export const manualConceptContent: Record<string, ManualConceptContent> = {
   ...policyContent,
   ...revitalizationContent,
   ...testingContent,
+  ...methodologyContent,
 };
