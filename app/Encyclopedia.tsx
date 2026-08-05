@@ -80,7 +80,7 @@ export default function Encyclopedia() {
   const modalRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    fetch("/encyclopedia.md")
+    fetch("encyclopedia.md")
       .then((response) => { if (!response.ok) throw new Error("load failed"); return response.text(); })
       .then((text) => setDeepEntries(parseMarkdown(text)))
       .catch(() => setLoadError(true));
