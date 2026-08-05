@@ -11,6 +11,7 @@ import { extensionsContent } from "./extensions.ts";
 import { handbookTopicsContent } from "./handbookTopics.ts";
 import { sociolinguisticsAContent } from "./sociolinguisticsA.ts";
 import { sociolinguisticsBContent } from "./sociolinguisticsB.ts";
+import { discourseContent } from "./discourse.ts";
 import type { ManualConceptContent } from "./types.ts";
 
 export const manualConceptContent: Record<string, ManualConceptContent> = {
@@ -27,4 +28,5 @@ export const manualConceptContent: Record<string, ManualConceptContent> = {
   ...handbookTopicsContent,
   ...sociolinguisticsAContent,
   ...sociolinguisticsBContent,
+  ...discourseContent,
 };
