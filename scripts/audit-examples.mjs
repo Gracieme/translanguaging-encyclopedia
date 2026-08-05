@@ -56,6 +56,11 @@ if (duplicateChinese) failures.push(`${duplicateChinese} duplicate Chinese examp
 if (duplicateEnglish) failures.push(`${duplicateEnglish} duplicate English examples`);
 if (duplicatePlainChinese) failures.push(`${duplicatePlainChinese} duplicate Plain Chinese glosses`);
 
+const singleGrammarExample = examples.find(({ concept }) => concept.term === "Single grammar thesis")?.example.chinese || "";
+if (!singleGrammarExample.includes("同一套整合语法") || singleGrammarExample.includes("小林在家说方言")) failures.push("Single grammar thesis lacks concept-specific evidence");
+const twoGrammarExample = examples.find(({ concept }) => concept.term === "Two-grammar assumption")?.example.chinese || "";
+if (!twoGrammarExample.includes("两个相对独立的语法系统")) failures.push("Two-grammar assumption lacks concept-specific evidence");
+
 const average = (values) => Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
 console.log(JSON.stringify({
   concepts: allConcepts.length,
