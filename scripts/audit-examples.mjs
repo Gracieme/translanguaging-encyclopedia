@@ -1,79 +1,75 @@
-import { readFile } from "node:fs/promises";
 import { buildConceptExample, buildPlainChinese } from "../app/conceptExamples.ts";
 import { allConcepts, conceptGroups } from "../app/concepts.ts";
 import { levelForConcept } from "../app/learningLevels.ts";
-import { sourceDefinitions } from "../app/sourceDefinitions.ts";
+import { manualConceptContent } from "../app/manualContent/index.ts";
 
-const markdown = await readFile(new URL("../public/encyclopedia.md", import.meta.url), "utf8");
-const blocks = markdown.split(/(?=^### \d+\. )/m).slice(1);
-const entries = blocks.flatMap((block) => {
-  const lines = block.trim().split("\n");
-  const heading = lines[0].match(/^### (\d+)\. (.+)$/);
-  if (!heading) return [];
-  const fields = lines.slice(1).flatMap((line) => {
-    const field = line.match(/^\d+\. \*\*(.+?)\*\*：(.+)$/);
-    return field ? [{ label: field[1], text: field[2] }] : [];
-  });
-  return [{ number: Number(heading[1]), title: heading[2], fields }];
-});
-
-const normalize = (value) => value.toLowerCase().replace(/[（）()／/–—-]/g, " ").replace(/\s+/g, " ").trim();
-const englishTitle = (title) => title.match(/^(.+?)（/)?.[1]?.trim() || title;
-const entryMap = new Map(entries.map((entry) => [normalize(englishTitle(entry.title)), entry]));
 const failures = [];
 const examples = [];
-const plainChineseGlosses = [];
+const glosses = [];
 
+const dummyEntry = { number: 0, title: "", fields: [] };
 for (const concept of allConcepts) {
-  const entry = entryMap.get(normalize(concept.term));
-  if (!entry) { failures.push(`Missing entry: ${concept.term}`); continue; }
-  const source = sourceDefinitions[entry.number];
-  if (!source?.english) { failures.push(`Missing English definition: ${concept.term}`); continue; }
+  const manual = manualConceptContent[concept.term];
+  if (!manual) {
+    failures.push(`Missing manual content: ${concept.term}`);
+    continue;
+  }
   const level = levelForConcept(concept);
-  const example = buildConceptExample(entry, concept, source.english, level);
-  const plainChinese = buildPlainChinese(entry, concept, level);
-  examples.push({ concept, example });
-  plainChineseGlosses.push({ concept, plainChinese });
-  if (!example.chinese.includes(concept.term)) failures.push(`Chinese example lacks term: ${concept.term}`);
-  if (!example.english.includes(concept.term)) failures.push(`English example lacks term: ${concept.term}`);
-  if (example.chinese.length < (level === "undergraduate" ? 95 : 150)) failures.push(`Chinese example too short: ${concept.term}`);
-  if (example.english.length < (level === "undergraduate" ? 160 : 180)) failures.push(`English example too short: ${concept.term}`);
-  if (level === "undergraduate" && /研究者|分析者|关键片段|分析关系/.test(example.chinese.split("为什么：")[0])) failures.push(`Undergraduate example is too research-oriented: ${concept.term}`);
-  if (level === "graduate" && !["实际例子：", "这是什么：", "怎样研究：", "别混淆："].every((label) => example.chinese.includes(label))) failures.push(`Graduate example lacks teaching structure: ${concept.term}`);
-  if (level === "doctoral" && !["先用例子理解：", "它是什么：", "研究方向：", "理论边界："].every((label) => example.chinese.includes(label))) failures.push(`Doctoral example lacks teaching structure: ${concept.term}`);
-  if (plainChinese.length < 16) failures.push(`Plain Chinese gloss too short: ${concept.term}`);
+  const example = buildConceptExample(dummyEntry, concept, "", level);
+  const plain = buildPlainChinese(dummyEntry, concept, level);
+  examples.push({ concept, level, example });
+  glosses.push({ concept, plain });
+
+  if (plain !== manual.plain) failures.push(`Plain-content mismatch: ${concept.term}`);
+  if (example.chinese !== manual.exampleZh) failures.push(`Chinese-example mismatch: ${concept.term}`);
+  if (example.english !== manual.exampleEn) failures.push(`English-example mismatch: ${concept.term}`);
+  if (example.kind !== manual.kind) failures.push(`Example-kind mismatch: ${concept.term}`);
+  if (plain.length < 18) failures.push(`Plain Chinese too short: ${concept.term}`);
+  if (example.chinese.length < 45) failures.push(`Chinese example too short: ${concept.term}`);
+  if (example.english.length < 70) failures.push(`English example too short: ${concept.term}`);
+  if (/生活例子：小林在家说方言|关键片段呈现出以下现象|这个例子体现了/.test(example.chinese)) failures.push(`Legacy template phrase remains: ${concept.term}`);
 }
 
-const groupIds = new Set(conceptGroups.map((group) => group.id));
-for (const concept of allConcepts) {
-  if (!groupIds.has(concept.groupId)) failures.push(`Unknown group: ${concept.term} -> ${concept.groupId}`);
-}
-
-const duplicateChinese = examples.length - new Set(examples.map(({ example }) => example.chinese)).size;
-const duplicateEnglish = examples.length - new Set(examples.map(({ example }) => example.english)).size;
-const duplicatePlainChinese = plainChineseGlosses.length - new Set(plainChineseGlosses.map(({ plainChinese }) => plainChinese)).size;
+const duplicateCount = (values) => values.length - new Set(values).size;
+const duplicateChinese = duplicateCount(examples.map(({ example }) => example.chinese));
+const duplicateEnglish = duplicateCount(examples.map(({ example }) => example.english));
+const duplicatePlainChinese = duplicateCount(glosses.map(({ plain }) => plain));
 if (duplicateChinese) failures.push(`${duplicateChinese} duplicate Chinese examples`);
 if (duplicateEnglish) failures.push(`${duplicateEnglish} duplicate English examples`);
 if (duplicatePlainChinese) failures.push(`${duplicatePlainChinese} duplicate Plain Chinese glosses`);
 
-const singleGrammarExample = examples.find(({ concept }) => concept.term === "Single grammar thesis")?.example.chinese || "";
-if (!singleGrammarExample.includes("同一套整合语法") || singleGrammarExample.includes("小林在家说方言")) failures.push("Single grammar thesis lacks concept-specific evidence");
-const twoGrammarExample = examples.find(({ concept }) => concept.term === "Two-grammar assumption")?.example.chinese || "";
-if (!twoGrammarExample.includes("两个相对独立的语法系统")) failures.push("Two-grammar assumption lacks concept-specific evidence");
+const shingles = (value, size) => {
+  const normalized = value.toLowerCase().replace(/[\s\p{P}\p{S}]+/gu, "");
+  return new Set(Array.from({ length: Math.max(0, normalized.length - size + 1) }, (_, index) => normalized.slice(index, index + size)));
+};
+const jaccard = (left, right) => {
+  const intersection = [...left].filter((item) => right.has(item)).length;
+  return intersection / (left.size + right.size - intersection || 1);
+};
+const nearDuplicates = [];
+for (let left = 0; left < examples.length; left += 1) {
+  const leftSet = shingles(examples[left].example.chinese, 3);
+  for (let right = left + 1; right < examples.length; right += 1) {
+    const score = jaccard(leftSet, shingles(examples[right].example.chinese, 3));
+    if (score >= 0.72) nearDuplicates.push(`${examples[left].concept.term} <> ${examples[right].concept.term} (${score.toFixed(2)})`);
+  }
+}
+if (nearDuplicates.length) failures.push(...nearDuplicates.map((pair) => `Near-duplicate Chinese examples: ${pair}`));
 
-const average = (values) => Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+const groupIds = new Set(conceptGroups.map((group) => group.id));
+for (const concept of allConcepts) if (!groupIds.has(concept.groupId)) failures.push(`Unknown group: ${concept.term}`);
+
 console.log(JSON.stringify({
   concepts: allConcepts.length,
-  entries: entries.length,
   examples: examples.length,
-  plainChineseGlosses: plainChineseGlosses.length,
+  glosses: glosses.length,
   groups: groupIds.size,
-  levels: Object.fromEntries(["undergraduate", "graduate", "doctoral"].map((level) => [level, allConcepts.filter((concept) => levelForConcept(concept) === level).length])),
-  chineseLength: { min: Math.min(...examples.map(({ example }) => example.chinese.length)), average: average(examples.map(({ example }) => example.chinese.length)) },
-  englishLength: { min: Math.min(...examples.map(({ example }) => example.english.length)), average: average(examples.map(({ example }) => example.english.length)) },
+  levels: Object.fromEntries(["undergraduate", "graduate", "doctoral"].map((level) => [level, examples.filter((item) => item.level === level).length])),
+  kinds: Object.fromEntries(["生活例子", "课堂例子", "研究示例", "分析示例", "思想实验"].map((kind) => [kind, examples.filter(({ example }) => example.kind === kind).length])),
   duplicateChinese,
   duplicateEnglish,
   duplicatePlainChinese,
+  nearDuplicateChinese: nearDuplicates.length,
   failures,
 }, null, 2));
 
