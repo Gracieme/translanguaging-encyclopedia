@@ -29,6 +29,19 @@ function levelForConcept(concept: { term: string; groupId: string }): LearningLe
 
 const normalize = (value: string) => value.toLowerCase().replace(/[（）()／/–—-]/g, " ").replace(/\s+/g, " ").trim();
 
+function entryParts(title: string) {
+  const match = title.match(/^(.+?)（(.+)）$/);
+  return match ? { english: match[1].trim(), chinese: match[2].trim() } : { english: title, chinese: "中文译名待校订" };
+}
+
+function matchingEntry(term: string, entries: DeepEntry[]) {
+  const target = normalize(term);
+  return entries.find((entry) => {
+    const title = normalize(entryParts(entry.title).english);
+    return title === target || title.startsWith(target) || target.startsWith(title);
+  });
+}
+
 function parseMarkdown(markdown: string): DeepEntry[] {
   const entries: DeepEntry[] = [];
   const blocks = markdown.split(/(?=^### \d+\. )/m).slice(1);
@@ -62,12 +75,13 @@ export default function Encyclopedia() {
   const filtered = useMemo(() => {
     const needle = normalize(query);
     return allConcepts.filter((concept) => {
+      const bilingualTitle = matchingEntry(concept.term, deepEntries)?.title || "";
       const inGroup = group === "all" || concept.groupId === group;
       const inLevel = level === "all" || levelForConcept(concept) === level;
-      const inSearch = !needle || normalize(`${concept.term} ${concept.groupLabel}`).includes(needle);
+      const inSearch = !needle || normalize(`${concept.term} ${bilingualTitle} ${concept.groupLabel}`).includes(needle);
       return inGroup && inLevel && inSearch;
     });
-  }, [group, level, query]);
+  }, [deepEntries, group, level, query]);
 
   const chooseLevel = (next: LearningLevel) => {
     setLevel(next);
@@ -76,11 +90,7 @@ export default function Encyclopedia() {
   };
 
   const openConcept = (term: string) => {
-    const target = normalize(term);
-    const exact = deepEntries.find((entry) => {
-      const title = normalize(entry.title.split("（")[0]);
-      return title === target || title.startsWith(target) || target.startsWith(title);
-    });
+    const exact = matchingEntry(term, deepEntries);
     if (exact) setSelected(exact);
   };
 
@@ -101,10 +111,10 @@ export default function Encyclopedia() {
       <section className="hero" id="top">
         <div className="eyebrow">Translanguaging · Applied Linguistics</div>
         <h1>从你现在的阶段，<br /><em>开始理解语言。</em></h1>
-        <p className="lede">一部按学习阶段组织的中文概念百科。先选路径，再读概念。</p>
+        <p className="lede">一部按学习阶段组织的中英双语概念百科。先选路径，再读概念。</p>
         <label className="hero-search">
           <span aria-hidden="true">⌕</span>
-          <input value={query} onChange={(event) => setQuery(event.target.value)} onFocus={() => document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" })} placeholder="搜索一个概念，例如 Translanguaging…" aria-label="搜索概念" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} onFocus={() => document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" })} placeholder="搜索中文或英文，例如：跨语实践 / Translanguaging" aria-label="搜索中英文概念" />
         </label>
       </section>
 
@@ -128,7 +138,7 @@ export default function Encyclopedia() {
         <div className="toolbar">
           <label className="search">
             <span aria-hidden="true">⌕</span>
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索英文概念或研究领域…" aria-label="搜索概念" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索中文、英文或研究领域…" aria-label="搜索中英文概念" />
           </label>
           <select value={group} onChange={(event) => setGroup(event.target.value)} aria-label="按类别筛选">
             <option value="all">全部类别</option>
@@ -146,13 +156,16 @@ export default function Encyclopedia() {
         <div className="result-line">{filtered.length} 个概念 · 其中 {filtered.filter((concept) => [...deepIndex].some((title) => title.startsWith(normalize(concept.term)) || normalize(concept.term).startsWith(title))).length} 个可阅读全文</div>
         <div className="concept-grid">
           {filtered.map((concept) => {
-            const deep = [...deepIndex].some((title) => title.startsWith(normalize(concept.term)) || normalize(concept.term).startsWith(title));
+            const entry = matchingEntry(concept.term, deepEntries);
+            const deep = Boolean(entry);
+            const bilingual = entry ? entryParts(entry.title) : { english: concept.term, chinese: "中文译名待校订" };
             return (
               <article className={`concept-card ${concept.color}`} key={`${concept.groupId}-${concept.term}`}>
-                <div className="card-meta"><span>{concept.groupLabel}</span>{deep && <b>深度词条</b>}</div>
-                <h3>{concept.term}</h3>
-                <p>{deep ? "已完成定义、谱系、辨析、批评与研究操作化。" : "已进入扩展词条注册表，正在按十维证据模板深化。"}</p>
-                <button onClick={() => openConcept(concept.term)} disabled={!deep}>{deep ? "阅读全文 →" : "编目完成"}</button>
+                <div className="card-meta"><span>{concept.groupLabel}</span>{deep && <b>双语深度词条</b>}</div>
+                <h3 lang="en">{bilingual.english}</h3>
+                <h4>{bilingual.chinese}</h4>
+                <p>{deep ? "保留英文原词，并呈现推荐译名、异译与十维研究含义。" : "英文原词已编目；中文译名将在核对术语史后发布。"}</p>
+                <button onClick={() => openConcept(concept.term)} disabled={!deep}>{deep ? "阅读全文 →" : "译名校订中"}</button>
               </article>
             );
           })}
@@ -173,7 +186,11 @@ export default function Encyclopedia() {
           <article className="modal" role="dialog" aria-modal="true" aria-labelledby="entry-title" onMouseDown={(event) => event.stopPropagation()}>
             <button className="modal-close" onClick={() => setSelected(null)} aria-label="关闭词条">×</button>
             <span className="entry-no">ENTRY {String(selected.number).padStart(3, "0")}</span>
-            <h2 id="entry-title">{selected.title}</h2>
+            <div className="bilingual-heading" id="entry-title">
+              <h2 lang="en">{entryParts(selected.title).english}</h2>
+              <h3>{entryParts(selected.title).chinese}</h3>
+            </div>
+            <aside className="translation-note"><b>译名说明</b><p>英文原词是稳定的检索锚点；中文部分呈现推荐译名及常见异译。斜线“／”表示并存译法，不表示它们在理论上完全等价。具体语义差异见下方“概念辨析”。</p></aside>
             <div className="entry-fields">
               {selected.fields.map((field, index) => <section key={`${field.label}-${index}`}><b>{String(index + 1).padStart(2, "0")}</b><div><h3>{field.label}</h3><p>{field.text}</p></div></section>)}
             </div>
