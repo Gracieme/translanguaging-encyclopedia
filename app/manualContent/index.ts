@@ -2,6 +2,8 @@ import { boundariesContent } from "./boundaries.ts";
 import { foundationsContent } from "./foundations.ts";
 import { powerContent } from "./power.ts";
 import { praxisContent } from "./praxis.ts";
+import { cognitionContent } from "./cognition.ts";
+import { educationContent } from "./education.ts";
 import type { ManualConceptContent } from "./types.ts";
 
 export const manualConceptContent: Record<string, ManualConceptContent> = {
@@ -9,4 +11,6 @@ export const manualConceptContent: Record<string, ManualConceptContent> = {
   ...boundariesContent,
   ...powerContent,
   ...praxisContent,
+  ...cognitionContent,
+  ...educationContent,
 };
