@@ -62,6 +62,7 @@ export default function Encyclopedia() {
   const [level, setLevel] = useState<LearningLevel | "all">("all");
   const [deepEntries, setDeepEntries] = useState<DeepEntry[]>([]);
   const [selected, setSelected] = useState<DeepEntry | null>(null);
+  const [isBrowsing, setIsBrowsing] = useState(false);
 
   useEffect(() => {
     fetch("/encyclopedia.md")
@@ -81,6 +82,7 @@ export default function Encyclopedia() {
   }, [deepEntries, group, level, query]);
 
   const chooseLevel = (next: LearningLevel) => {
+    setIsBrowsing(true);
     setLevel(next);
     setGroup("all");
     document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" });
@@ -89,6 +91,11 @@ export default function Encyclopedia() {
   const openConcept = (term: string) => {
     const exact = matchingEntry(term, deepEntries);
     if (exact) setSelected(exact);
+  };
+
+  const startBrowsing = () => {
+    setIsBrowsing(true);
+    document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -100,7 +107,7 @@ export default function Encyclopedia() {
         </a>
         <nav aria-label="主要导航">
           <a href="#paths">学习路径</a>
-          <a href="#lexicon">查概念</a>
+          <a href="#lexicon" onClick={() => setIsBrowsing(true)}>查概念</a>
           <a href="#about">关于</a>
         </nav>
       </header>
@@ -111,7 +118,7 @@ export default function Encyclopedia() {
         <p className="lede">一部按学习阶段组织的中英双语概念百科。先选路径，再读概念。</p>
         <label className="hero-search">
           <span aria-hidden="true">⌕</span>
-          <input value={query} onChange={(event) => setQuery(event.target.value)} onFocus={() => document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" })} placeholder="搜索中文或英文，例如：跨语实践 / Translanguaging" aria-label="搜索中英文概念" />
+          <input value={query} onChange={(event) => { setQuery(event.target.value); setIsBrowsing(true); }} onFocus={() => document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" })} placeholder="搜索中文或英文，例如：跨语实践 / Translanguaging" aria-label="搜索中英文概念" />
         </label>
       </section>
 
@@ -129,9 +136,23 @@ export default function Encyclopedia() {
 
       <section className="lexicon" id="lexicon">
         <div className="section-heading">
-          <div><span className="kicker">CONCEPT LIBRARY</span><h2>{level === "all" ? "全部概念" : levelProfiles.find((item) => item.id === level)?.label}</h2></div>
-          <button className="reset-link" onClick={() => { setLevel("all"); setGroup("all"); setQuery(""); }}>清除筛选</button>
+          <div><span className="kicker">CONCEPT LIBRARY</span><h2>{isBrowsing ? (level === "all" ? "概念索引" : levelProfiles.find((item) => item.id === level)?.label) : "怎样使用这部百科？"}</h2></div>
+          {isBrowsing && <button className="reset-link" onClick={() => { setLevel("all"); setGroup("all"); setQuery(""); }}>清除筛选</button>}
         </div>
+        {!isBrowsing ? <div className="guide-card">
+          <article className="concept-card red">
+            <div className="card-meta"><span>基础理论与本体论</span><b>示范词条</b></div>
+            <h3 lang="en">Translanguaging</h3>
+            <h4>跨语实践／跨语用</h4>
+            <p>每张卡片都通向一个双语深度词条：先看英文原词与中文译名，再依次阅读定义、理论谱系、应用、辨析、批评和研究操作化。</p>
+            <button onClick={() => openConcept("Translanguaging")}>打开示范词条 →</button>
+          </article>
+          <div className="guide-copy">
+            <span>三种进入方式</span>
+            <ol><li>直接搜索中文或英文术语</li><li>按本科、研究生或博士阶段选择学习路径</li><li>进入索引后按学科类别继续筛选</li></ol>
+            <button className="browse-button" onClick={startBrowsing}>进入完整概念索引 →</button>
+          </div>
+        </div> : <>
         <div className="toolbar">
           <label className="search">
             <span aria-hidden="true">⌕</span>
@@ -167,6 +188,7 @@ export default function Encyclopedia() {
           })}
         </div>}
         {filtered.length === 0 && <div className="empty">没有匹配概念。尝试缩短关键词或切换类别。</div>}
+        </>}
       </section>
 
       <section className="about" id="about">
