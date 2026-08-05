@@ -7,6 +7,7 @@ import { educationContent } from "./education.ts";
 import { literacyContent } from "./literacy.ts";
 import { assessmentContent } from "./assessment.ts";
 import { methodContent } from "./method.ts";
+import { extensionsContent } from "./extensions.ts";
 import type { ManualConceptContent } from "./types.ts";
 
 export const manualConceptContent: Record<string, ManualConceptContent> = {
@@ -19,4 +20,5 @@ export const manualConceptContent: Record<string, ManualConceptContent> = {
   ...literacyContent,
   ...assessmentContent,
   ...methodContent,
+  ...extensionsContent,
 };
