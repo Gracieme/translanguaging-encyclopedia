@@ -14,6 +14,7 @@ import { sociolinguisticsBContent } from "./sociolinguisticsB.ts";
 import { discourseContent } from "./discourse.ts";
 import { slaContent } from "./sla.ts";
 import { policyContent } from "./policy.ts";
+import { revitalizationContent } from "./revitalization.ts";
 import type { ManualConceptContent } from "./types.ts";
 
 export const manualConceptContent: Record<string, ManualConceptContent> = {
@@ -33,4 +34,5 @@ export const manualConceptContent: Record<string, ManualConceptContent> = {
   ...discourseContent,
   ...slaContent,
   ...policyContent,
+  ...revitalizationContent,
 };
