@@ -383,6 +383,30 @@ const undergraduateTermContrasts: Record<string, { chinese: string; english: str
   "Discrimination": { chinese: "这里已经发生了不平等行为，不只是心里的负面看法。", english: "Unequal action has occurred here; this is more than a negative belief or attitude." },
 };
 
+const researchDirections: Record<string, { graduateZh: string; graduateEn: string; doctoralZh: string; doctoralEn: string }> = {
+  foundations: { graduateZh: "可用课堂录像和多模态转写，追踪语言、身体与物质环境怎样共同形成意义。", graduateEn: "Use classroom video and multimodal transcription to trace how language, bodies, and material settings jointly produce meaning.", doctoralZh: "可进一步追问：若意义是关系性生成的，研究的分析单位和‘语言’本体应怎样重新界定？", doctoralEn: "Ask how a relational account of meaning requires the unit of analysis and the ontology of ‘language’ to be redefined." },
+  boundaries: { graduateZh: "可比较制度使用的语言名称、参与者自我描述和实际互动资源，看三者边界是否一致。", graduateEn: "Compare institutional language labels, participants’ self-descriptions, and resources used in interaction to test whether their boundaries align.", doctoralZh: "可进一步追问：命名语言的边界是谁建立的，它在何种条件下成为心理事实、社会事实或治理工具？", doctoralEn: "Ask who constructs named-language boundaries and when they operate as psychological facts, social facts, or instruments of governance." },
+  power: { graduateZh: "可比较不同群体面对相同表达时得到的评价、机会或处罚，并访谈参与者如何理解这种差异。", graduateEn: "Compare evaluation, opportunity, or sanction across groups using similar language and interview participants about the difference.", doctoralZh: "可进一步追问：种族化、殖民性与语言规范通过什么机制共同生产‘能力不足’这一判断？", doctoralEn: "Ask through what mechanisms racialization, coloniality, and language norms jointly produce judgments of deficiency." },
+  praxis: { graduateZh: "可记录一项课堂或社区改革前后的决策权、参与方式和资源分配，检查改变是否真正发生。", graduateEn: "Document decision rights, participation, and resource distribution before and after a classroom or community intervention.", doctoralZh: "可进一步追问：抵抗或伦理实践怎样避免被制度吸收，并在知识生产关系中形成可持续改变？", doctoralEn: "Ask how resistance or ethical praxis avoids institutional capture and sustains change in relations of knowledge production." },
+  cognition: { graduateZh: "可结合反应时、眼动、任务表现和访谈，检验提出的认知机制是否得到多种证据支持。", graduateEn: "Combine response time, eye tracking, task performance, and interviews to test whether multiple measures support the proposed cognitive mechanism.", doctoralZh: "可进一步追问：实验指标是否把动态、情境化的多语认知错误地还原为稳定的个体变量？", doctoralEn: "Ask whether experimental measures reduce dynamic, situated multilingual cognition to stable individual variables." },
+  education: { graduateZh: "可比较有无该教学安排的课堂录像、学生作品和访谈，分析它怎样影响参与和学习。", graduateEn: "Compare classroom video, student work, and interviews with and without the pedagogical design to examine participation and learning.", doctoralZh: "可进一步追问：教学设计在支持学习的同时，是否仍复制了命名语言、标准能力或殖民知识的边界？", doctoralEn: "Ask whether the pedagogy supports learning while still reproducing boundaries of named language, standard competence, or colonial knowledge." },
+  literacy: { graduateZh: "可收集草稿、屏幕录制、成品和回顾访谈，追踪意义如何跨语言、媒介和版本移动。", graduateEn: "Collect drafts, screen recordings, final products, and stimulated-recall interviews to trace meaning across languages, media, and versions.", doctoralZh: "可进一步追问：当文本生产分布在人、工具和平台之间时，作者、文本和读写能力应如何重新定义？", doctoralEn: "Ask how authorship, text, and literacy should be redefined when production is distributed across people, tools, and platforms." },
+  assessment: { graduateZh: "可让评分者使用不同量规评价同一批作答，并比较分数、推理过程和评分解释。", graduateEn: "Have raters score the same responses with different rubrics and compare scores, reasoning processes, and score interpretations.", doctoralZh: "可进一步追问：测评构念由谁规定，多语作答改变的是能力呈现、构念边界还是制度公平？", doctoralEn: "Ask who defines the assessment construct and whether multilingual responding changes access to competence, construct boundaries, or institutional fairness." },
+  method: { graduateZh: "可据此明确研究问题、资料单位、编码规则和反例处理，并保留可检查的分析记录。", graduateEn: "Specify the research question, data unit, coding rules, and treatment of counterexamples while keeping an auditable analytic record.", doctoralZh: "可进一步追问：这种方法把什么当作证据、排除了什么，以及它如何塑造最终能够提出的知识主张？", doctoralEn: "Ask what the method recognizes as evidence, what it excludes, and how it shapes the knowledge claims that become possible." },
+  extensions: { graduateZh: "可把两个相近概念用于同一组资料，比较它们各自能解释什么，以及是否产生不同分析结论。", graduateEn: "Apply two neighboring concepts to the same dataset and compare what each explains and whether they produce different conclusions.", doctoralZh: "可进一步追问：新增术语是否真正增加解释力，还是只把原有现象重新命名并扩大概念边界？", doctoralEn: "Ask whether the added term yields genuine explanatory gain or merely renames an existing phenomenon and expands conceptual territory." },
+  handbook_topics: { graduateZh: "可选择一章中的核心命题，用新的课堂、社区或数字资料检验其适用范围。", graduateEn: "Select a central proposition from a handbook chapter and test its scope with new classroom, community, or digital data.", doctoralZh: "可进一步追问：该复合专题连接了哪些本体论、政治与方法论承诺，它们之间是否存在张力？", doctoralEn: "Ask which ontological, political, and methodological commitments the composite theme joins and whether tensions exist among them." },
+  sociolinguistics: { graduateZh: "可结合互动录音、社会网络资料和听者判断，研究语言变异与社会意义的关系。", graduateEn: "Combine interaction recordings, social-network data, and listener judgments to study relations between variation and social meaning.", doctoralZh: "可进一步追问：社会意义何时来自参与者取向，何时来自历史结构或研究者自己的分类？", doctoralEn: "Ask when social meaning derives from participant orientation, historical structure, or the researcher’s own categorization." },
+  discourse: { graduateZh: "可逐行转写互动，分析前后轮次、措辞和回应怎样共同完成某种社会行动。", graduateEn: "Transcribe interaction turn by turn and analyze how sequence, wording, and response jointly accomplish a social action.", doctoralZh: "可进一步追问：局部互动秩序怎样与制度话语和长期权力结构连接，而又不把一方简化为另一方？", doctoralEn: "Ask how local interactional order connects with institutional discourse and durable power without reducing one level to the other." },
+  sla: { graduateZh: "可用多次任务和延迟测验追踪学习者变化，区分即时支架效果与持续发展。", graduateEn: "Use repeated tasks and delayed measures to distinguish immediate scaffolding effects from sustained development.", doctoralZh: "可进一步追问：所谓‘习得’是否预设单语终点，以及动态多语能力应以什么发展单位来描述？", doctoralEn: "Ask whether ‘acquisition’ presupposes a monolingual endpoint and what developmental unit can represent dynamic multilingual competence." },
+  policy: { graduateZh: "可比较政策文本、访谈、课堂观察和资源配置，区分正式规定与实际执行。", graduateEn: "Compare policy texts, interviews, classroom observation, and resource allocation to distinguish formal policy from enactment.", doctoralZh: "可进一步追问：政策如何通过分类、测量和资源分配把语言意识形态转化为可执行的制度现实？", doctoralEn: "Ask how policy converts language ideology into enforceable institutional reality through classification, measurement, and resource allocation." },
+  revitalization: { graduateZh: "可长期追踪家庭使用、代际活动、学习者参与和社区决策权，而不只统计课程人数。", graduateEn: "Track family use, intergenerational activity, learner participation, and community decision rights over time rather than only enrollment.", doctoralZh: "可进一步追问：复兴实践怎样在标准化、可教性与社区多样性之间分配权威和所有权？", doctoralEn: "Ask how revitalization distributes authority and ownership across standardization, teachability, and community diversity." },
+  testing: { graduateZh: "可结合试题统计、考生思维报告和专家审查，判断分数差异来自能力、题目还是语言负担。", graduateEn: "Combine item statistics, test-taker reports, and expert review to determine whether score differences arise from ability, task design, or language load.", doctoralZh: "可进一步追问：测试的公平与效度是否依赖一个未经检验的单语能力模型？", doctoralEn: "Ask whether test fairness and validity depend on an unexamined monolingual model of competence." },
+  methodology: { graduateZh: "可把研究问题、认识论立场、资料选择和结论逐项对照，检查它们是否一致。", graduateEn: "Map research questions, epistemological stance, data selection, and conclusions to check their coherence.", doctoralZh: "可进一步追问：研究者的本体论和认识论承诺如何规定谁能成为知识主体、什么能成为证据？", doctoralEn: "Ask how ontological and epistemological commitments determine who may be a knower and what may count as evidence." },
+  translation_ext: { graduateZh: "可比较原文、译文、修改记录和使用者反馈，分析意义在转换中被保留、重组或删除的部分。", graduateEn: "Compare source text, translation, revision history, and user feedback to analyze what meaning is retained, reorganized, or removed.", doctoralZh: "可进一步追问：翻译中的‘对应’由谁规定，跨语意义重构如何挑战原文与译文的稳定边界？", doctoralEn: "Ask who defines equivalence and how translingual reconstruction challenges stable boundaries between source and target." },
+  identity: { graduateZh: "可比较参与者在不同互动中的自称、语言选择和他人回应，分析身份如何被协商。", graduateEn: "Compare self-reference, language choice, and others’ responses across interactions to analyze identity negotiation.", doctoralZh: "可进一步追问：流动身份如何同时受局部互动、制度分类与历史权力约束？", doctoralEn: "Ask how fluid identity is simultaneously constrained by local interaction, institutional classification, and historical power." },
+  technology_ext: { graduateZh: "可收集屏幕录制、版本记录和用户访谈，追踪平台功能或人工智能怎样改变表达过程。", graduateEn: "Collect screen recordings, version histories, and user interviews to trace how platform features or AI alter production.", doctoralZh: "可进一步追问：当能动性分布在人、算法和界面之间时，作者性、责任和语言实践应如何界定？", doctoralEn: "Ask how authorship, responsibility, and language practice should be defined when agency is distributed across people, algorithms, and interfaces." },
+};
+
 function hash(value: string) {
   return Array.from(value).reduce((total, character) => (total * 31 + character.charCodeAt(0)) >>> 0, 7);
 }
@@ -411,8 +435,8 @@ export function buildConceptExample(
   const sceneIndex = hash(concept.term) % frame.scenesZh.length;
   const meaning = firstSentence(entry.fields.find((field) => field.label === "含义")?.text || entry.fields[0]?.text || "");
   const application = firstSentence(entry.fields.find((field) => field.label === "应用语言学用途")?.text || "", 92);
+  const applicationArea = application.replace(/^用于/, "").replace(/^适用于/, "");
   const zhName = chineseTitle(entry.title);
-  const applicationBridge = application ? `研究用途：${application}。` : "研究者随后用更多资料检查这一解释。";
 
   if (level === "undergraduate") {
     const scene = undergraduateTermScenes[concept.term] || undergraduateGroupScenes[concept.groupId] || undergraduateGroupScenes.sociolinguistics;
@@ -423,8 +447,17 @@ export function buildConceptExample(
     };
   }
 
+  const direction = researchDirections[concept.groupId] || researchDirections.extensions;
+
+  if (level === "graduate") {
+    return {
+      chinese: `实际例子：${frame.scenesZh[sceneIndex]}。这是什么：在这个例子里，“${zhName}（${concept.term}）”指的是：${meaning}。怎样研究：${direction.graduateZh}${applicationArea ? ` 常见研究领域包括：${applicationArea}。` : ""}别混淆：${frame.contrastZh}`,
+      english: `Concrete example: ${frame.scenesEn[sceneIndex]}. What it is: in this example, ${concept.term} means the following: ${englishSentence(englishDefinition)} Research use: ${direction.graduateEn}${applicationArea ? ` The concept can be investigated in the applied domains identified in this entry.` : ""} Key distinction: ${frame.contrastEn}`,
+    };
+  }
+
   return {
-    chinese: `情境：${frame.scenesZh[sceneIndex]}，关键片段呈现出以下现象或分析关系：${meaning}。判断：因此可用“${zhName}（${concept.term}）”解释这个片段。${applicationBridge}辨析：${frame.contrastZh}`,
-    english: `Situation: ${frame.scenesEn[sceneIndex]}. Diagnosis: in the focal evidence, the analyst documents the defining process of ${concept.term}: ${englishSentence(englishDefinition)} Contrast: ${frame.contrastEn}`,
+    chinese: `先用例子理解：${frame.scenesZh[sceneIndex]}。它是什么：用“${zhName}（${concept.term}）”解释这个例子时，重点在于：${meaning}；它试图解释表面行为背后的理论机制，而不只是给行为贴标签。研究方向：${direction.doctoralZh}${applicationArea ? ` 它还可进入这些领域：${applicationArea}。` : ""}理论边界：${frame.contrastZh}`,
+    english: `Start with an example: ${frame.scenesEn[sceneIndex]}. What it is: through ${concept.term}, the focus is the mechanism stated in its definition: ${englishSentence(englishDefinition)} The concept explains more than the surface label. Research direction: ${direction.doctoralEn}${applicationArea ? ` It can also be investigated across the applied domains identified in this entry.` : ""} Theoretical boundary: ${frame.contrastEn}`,
   };
 }
