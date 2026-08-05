@@ -114,7 +114,7 @@ export default function Encyclopedia() {
 
       <section className="hero" id="top">
         <div className="eyebrow">Translanguaging · Applied Linguistics · Sociolinguistics</div>
-        <h1>从应用语言学与社会语言学，<br /><em>拆解超语。</em></h1>
+        <h1><span>从应用语言学与社会语言学出发</span><em>拆解超语</em></h1>
         <p className="lede">先补足语言、社会、变异、互动与教育的基础知识，再进入超语的理论争议与研究方法。</p>
         <label className="hero-search">
           <span aria-hidden="true">⌕</span>

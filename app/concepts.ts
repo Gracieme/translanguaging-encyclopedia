@@ -160,6 +160,11 @@ export const conceptGroups: ConceptGroup[] = [
       "Pidgin", "Creole", "Creole continuum", "Language death", "Dialectology", "Isogloss", "Dialect contact",
       "Apparent time", "Real time", "Social network", "Communication accommodation", "Referee design", "Stylization",
       "Indexical field", "Indexical cycle", "Linguistic landscape"
+      , "Individual bilingualism", "Societal multilingualism", "Balanced bilingualism", "Dominant bilingualism", "Receptive bilingualism",
+      "Language census", "Language function", "Graded Intergenerational Disruption Scale", "Language variety", "Code",
+      "Speech event", "Speech situation", "Participant role", "Audience role", "Politeness",
+      "Social class variation", "Ethnic variation", "Gender variation", "Age grading", "Linguistic change", "Sound change",
+      "Linguistic market", "Strong tie", "Weak tie", "Perceptual dialectology", "Style stratification", "Structure–agency relation"
     ]
   },
   {
