@@ -103,7 +103,7 @@ export default function Encyclopedia() {
       <header className="masthead">
         <a className="brand" href="#top" aria-label="返回首页">
           <span className="brand-mark">TL</span>
-          <span>跨语实践概念百科</span>
+          <span>应用语言学 × 社会语言学：超语概念百科</span>
         </a>
         <nav aria-label="主要导航">
           <a href="#paths">学习路径</a>
@@ -113,9 +113,9 @@ export default function Encyclopedia() {
       </header>
 
       <section className="hero" id="top">
-        <div className="eyebrow">Translanguaging · Applied Linguistics</div>
-        <h1>从你现在的阶段，<br /><em>开始理解语言。</em></h1>
-        <p className="lede">一部按学习阶段组织的中英双语概念百科。先选路径，再读概念。</p>
+        <div className="eyebrow">Translanguaging · Applied Linguistics · Sociolinguistics</div>
+        <h1>从应用语言学与社会语言学，<br /><em>拆解超语。</em></h1>
+        <p className="lede">先补足语言、社会、变异、互动与教育的基础知识，再进入超语的理论争议与研究方法。</p>
         <label className="hero-search">
           <span aria-hidden="true">⌕</span>
           <input value={query} onChange={(event) => { setQuery(event.target.value); setIsBrowsing(true); }} onFocus={() => document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" })} placeholder="搜索中文或英文，例如：跨语实践 / Translanguaging" aria-label="搜索中英文概念" />
@@ -193,11 +193,11 @@ export default function Encyclopedia() {
 
       <section className="about" id="about">
         <details><summary>这部百科如何解释每个概念？</summary><p>每个完整词条依次说明：定义、问题来源、理论背景、学者谱系、应用、相近概念辨析、手册用法、历时变化、优势与批评，以及研究操作化。</p></details>
-        <details><summary>内容依据是什么？</summary><p>以《The Handbook of Translanguaging》为主文献，以《The Handbook of Applied Linguistics》重建学科背景；它是一部概念百科，不是章节摘要。</p></details>
+        <details><summary>内容依据是什么？</summary><p>以《The Handbook of Translanguaging》为主文献，以《The Handbook of Applied Linguistics》重建应用语言学背景，并以 Allan Bell 的《The Guidebook to Sociolinguistics》补足多语、语言接触、变异、互动、身份与社会意义等基础。它是一部概念百科，不是章节摘要。</p></details>
         <p className="quiet-stat">已编目 {allConcepts.length} 个概念 · 已完成 {deepEntries.length} 个十维深度词条</p>
       </section>
 
-      <footer><span>跨语实践概念百科</span><p>Evidence-controlled · Concept-led · Research-ready</p><a href="#top">回到顶部 ↑</a></footer>
+      <footer><span>应用语言学 × 社会语言学：超语概念百科</span><p>Evidence-controlled · Concept-led · Research-ready</p><a href="#top">回到顶部 ↑</a></footer>
 
       {selected && (
         <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>

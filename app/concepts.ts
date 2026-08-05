@@ -155,7 +155,11 @@ export const conceptGroups: ConceptGroup[] = [
       "Heteroglossia", "Diglossia", "Enregisterment", "Indexicality", "Indexical order",
       "Language ideology", "Standard language ideology", "Language attitude", "Prestige", "Stigma",
       "Overt prestige", "Covert prestige", "Style-shifting", "Audience design", "Speaker design",
-      "Sociolinguistic variable", "Variation", "Social meaning", "Ethnolinguistic vitality", "Superdiversity"
+      "Sociolinguistic variable", "Variation", "Social meaning", "Ethnolinguistic vitality", "Superdiversity",
+      "Language contact", "Language choice", "Language domain", "Ethnography of communication", "Variationist sociolinguistics",
+      "Pidgin", "Creole", "Creole continuum", "Language death", "Dialectology", "Isogloss", "Dialect contact",
+      "Apparent time", "Real time", "Social network", "Communication accommodation", "Referee design", "Stylization",
+      "Indexical field", "Indexical cycle", "Linguistic landscape"
     ]
   },
   {
