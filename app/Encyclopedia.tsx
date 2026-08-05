@@ -32,16 +32,12 @@ const normalize = (value: string) => value.toLowerCase().replace(/[（）()／/�
 
 function entryParts(title: string) {
   const match = title.match(/^(.+?)（(.+)）$/);
-  const chinese = match?.[2].replace(/；本百科保留英文作总称$/, "").trim();
-  return match ? { english: match[1].trim(), chinese: chinese || "中文译名待校订" } : { english: title, chinese: "中文译名待校订" };
+  return match ? { english: match[1].trim(), chinese: match[2].trim() } : { english: title, chinese: "" };
 }
 
 function matchingEntry(term: string, entries: DeepEntry[]) {
   const target = normalize(term);
-  return entries.find((entry) => {
-    const title = normalize(entryParts(entry.title).english);
-    return title === target || title.startsWith(target) || target.startsWith(title);
-  });
+  return entries.find((entry) => normalize(entryParts(entry.title).english) === target);
 }
 
 function parseMarkdown(markdown: string): DeepEntry[] {
@@ -73,7 +69,6 @@ export default function Encyclopedia() {
       .then((text) => setDeepEntries(parseMarkdown(text)));
   }, []);
 
-  const deepIndex = useMemo(() => new Set(deepEntries.map((entry) => normalize(entry.title.split("（")[0]))), [deepEntries]);
   const filtered = useMemo(() => {
     const needle = normalize(query);
     return allConcepts.filter((concept) => {
@@ -155,22 +150,22 @@ export default function Encyclopedia() {
           <button className={group === "all" ? "active" : ""} onClick={() => setGroup("all")}>全部</button>
           {conceptGroups.map((item) => <button key={item.id} className={group === item.id ? "active" : ""} onClick={() => setGroup(item.id)}>{item.label}</button>)}
         </div></details>
-        <div className="result-line">{filtered.length} 个概念 · 其中 {filtered.filter((concept) => [...deepIndex].some((title) => title.startsWith(normalize(concept.term)) || normalize(concept.term).startsWith(title))).length} 个可阅读全文</div>
-        <div className="concept-grid">
-          {filtered.map((concept) => {
+        <div className="result-line">{filtered.length} 个概念 · {filtered.filter((concept) => Boolean(matchingEntry(concept.term, deepEntries))).length} 个可阅读全文</div>
+        {deepEntries.length === 0 ? <div className="empty">正在载入完整百科内容…</div> : <div className="concept-grid">
+          {filtered.flatMap((concept) => {
             const entry = matchingEntry(concept.term, deepEntries);
-            const deep = Boolean(entry);
-            const bilingual = entry ? entryParts(entry.title) : { english: concept.term, chinese: "中文译名待校订" };
-            return (
+            if (!entry) return [];
+            const bilingual = entryParts(entry.title);
+            return [
               <article className={`concept-card ${concept.color}`} key={`${concept.groupId}-${concept.term}`}>
-                <div className="card-meta"><span>{concept.groupLabel}</span>{deep && <b>双语深度词条</b>}</div>
+                <div className="card-meta"><span>{concept.groupLabel}</span><b>双语深度词条</b></div>
                 <h3 lang="en">{bilingual.english}</h3>
                 <h4>{bilingual.chinese}</h4>
-                <button onClick={() => openConcept(concept.term)} disabled={!deep}>{deep ? "阅读全文 →" : "译名校订中"}</button>
+                <button onClick={() => openConcept(concept.term)}>阅读全文 →</button>
               </article>
-            );
+            ];
           })}
-        </div>
+        </div>}
         {filtered.length === 0 && <div className="empty">没有匹配概念。尝试缩短关键词或切换类别。</div>}
       </section>
 
