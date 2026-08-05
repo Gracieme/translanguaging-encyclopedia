@@ -1,0 +1,61 @@
+import { readFile } from "node:fs/promises";
+import { buildConceptExample } from "../app/conceptExamples.ts";
+import { allConcepts, conceptGroups } from "../app/concepts.ts";
+import { sourceDefinitions } from "../app/sourceDefinitions.ts";
+
+const markdown = await readFile(new URL("../public/encyclopedia.md", import.meta.url), "utf8");
+const blocks = markdown.split(/(?=^### \d+\. )/m).slice(1);
+const entries = blocks.flatMap((block) => {
+  const lines = block.trim().split("\n");
+  const heading = lines[0].match(/^### (\d+)\. (.+)$/);
+  if (!heading) return [];
+  const fields = lines.slice(1).flatMap((line) => {
+    const field = line.match(/^\d+\. \*\*(.+?)\*\*：(.+)$/);
+    return field ? [{ label: field[1], text: field[2] }] : [];
+  });
+  return [{ number: Number(heading[1]), title: heading[2], fields }];
+});
+
+const normalize = (value) => value.toLowerCase().replace(/[（）()／/–—-]/g, " ").replace(/\s+/g, " ").trim();
+const englishTitle = (title) => title.match(/^(.+?)（/)?.[1]?.trim() || title;
+const entryMap = new Map(entries.map((entry) => [normalize(englishTitle(entry.title)), entry]));
+const failures = [];
+const examples = [];
+
+for (const concept of allConcepts) {
+  const entry = entryMap.get(normalize(concept.term));
+  if (!entry) { failures.push(`Missing entry: ${concept.term}`); continue; }
+  const source = sourceDefinitions[entry.number];
+  if (!source?.english) { failures.push(`Missing English definition: ${concept.term}`); continue; }
+  const example = buildConceptExample(entry, concept, source.english);
+  examples.push({ concept, example });
+  if (!example.chinese.includes(concept.term)) failures.push(`Chinese example lacks term: ${concept.term}`);
+  if (!example.english.includes(concept.term)) failures.push(`English example lacks term: ${concept.term}`);
+  if (example.chinese.length < 150) failures.push(`Chinese example too short: ${concept.term}`);
+  if (example.english.length < 180) failures.push(`English example too short: ${concept.term}`);
+}
+
+const groupIds = new Set(conceptGroups.map((group) => group.id));
+for (const concept of allConcepts) {
+  if (!groupIds.has(concept.groupId)) failures.push(`Unknown group: ${concept.term} -> ${concept.groupId}`);
+}
+
+const duplicateChinese = examples.length - new Set(examples.map(({ example }) => example.chinese)).size;
+const duplicateEnglish = examples.length - new Set(examples.map(({ example }) => example.english)).size;
+if (duplicateChinese) failures.push(`${duplicateChinese} duplicate Chinese examples`);
+if (duplicateEnglish) failures.push(`${duplicateEnglish} duplicate English examples`);
+
+const average = (values) => Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+console.log(JSON.stringify({
+  concepts: allConcepts.length,
+  entries: entries.length,
+  examples: examples.length,
+  groups: groupIds.size,
+  chineseLength: { min: Math.min(...examples.map(({ example }) => example.chinese.length)), average: average(examples.map(({ example }) => example.chinese.length)) },
+  englishLength: { min: Math.min(...examples.map(({ example }) => example.english.length)), average: average(examples.map(({ example }) => example.english.length)) },
+  duplicateChinese,
+  duplicateEnglish,
+  failures,
+}, null, 2));
+
+if (failures.length) process.exitCode = 1;
