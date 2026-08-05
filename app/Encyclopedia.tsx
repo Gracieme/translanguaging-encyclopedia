@@ -31,7 +31,8 @@ const normalize = (value: string) => value.toLowerCase().replace(/[（）()／/�
 
 function entryParts(title: string) {
   const match = title.match(/^(.+?)（(.+)）$/);
-  return match ? { english: match[1].trim(), chinese: match[2].trim() } : { english: title, chinese: "中文译名待校订" };
+  const chinese = match?.[2].replace(/；本百科保留英文作总称$/, "").trim();
+  return match ? { english: match[1].trim(), chinese: chinese || "中文译名待校订" } : { english: title, chinese: "中文译名待校订" };
 }
 
 function matchingEntry(term: string, entries: DeepEntry[]) {
@@ -164,7 +165,6 @@ export default function Encyclopedia() {
                 <div className="card-meta"><span>{concept.groupLabel}</span>{deep && <b>双语深度词条</b>}</div>
                 <h3 lang="en">{bilingual.english}</h3>
                 <h4>{bilingual.chinese}</h4>
-                <p>{deep ? "保留英文原词，并呈现推荐译名、异译与十维研究含义。" : "英文原词已编目；中文译名将在核对术语史后发布。"}</p>
                 <button onClick={() => openConcept(concept.term)} disabled={!deep}>{deep ? "阅读全文 →" : "译名校订中"}</button>
               </article>
             );
