@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { buildConceptExample } from "../app/conceptExamples.ts";
+import { buildConceptExample, buildPlainChinese } from "../app/conceptExamples.ts";
 import { allConcepts, conceptGroups } from "../app/concepts.ts";
 import { levelForConcept } from "../app/learningLevels.ts";
 import { sourceDefinitions } from "../app/sourceDefinitions.ts";
@@ -22,6 +22,7 @@ const englishTitle = (title) => title.match(/^(.+?)（/)?.[1]?.trim() || title;
 const entryMap = new Map(entries.map((entry) => [normalize(englishTitle(entry.title)), entry]));
 const failures = [];
 const examples = [];
+const plainChineseGlosses = [];
 
 for (const concept of allConcepts) {
   const entry = entryMap.get(normalize(concept.term));
@@ -30,7 +31,9 @@ for (const concept of allConcepts) {
   if (!source?.english) { failures.push(`Missing English definition: ${concept.term}`); continue; }
   const level = levelForConcept(concept);
   const example = buildConceptExample(entry, concept, source.english, level);
+  const plainChinese = buildPlainChinese(entry, concept, level);
   examples.push({ concept, example });
+  plainChineseGlosses.push({ concept, plainChinese });
   if (!example.chinese.includes(concept.term)) failures.push(`Chinese example lacks term: ${concept.term}`);
   if (!example.english.includes(concept.term)) failures.push(`English example lacks term: ${concept.term}`);
   if (example.chinese.length < (level === "undergraduate" ? 95 : 150)) failures.push(`Chinese example too short: ${concept.term}`);
@@ -38,6 +41,7 @@ for (const concept of allConcepts) {
   if (level === "undergraduate" && /研究者|分析者|关键片段|分析关系/.test(example.chinese.split("为什么：")[0])) failures.push(`Undergraduate example is too research-oriented: ${concept.term}`);
   if (level === "graduate" && !["实际例子：", "这是什么：", "怎样研究：", "别混淆："].every((label) => example.chinese.includes(label))) failures.push(`Graduate example lacks teaching structure: ${concept.term}`);
   if (level === "doctoral" && !["先用例子理解：", "它是什么：", "研究方向：", "理论边界："].every((label) => example.chinese.includes(label))) failures.push(`Doctoral example lacks teaching structure: ${concept.term}`);
+  if (plainChinese.length < 16) failures.push(`Plain Chinese gloss too short: ${concept.term}`);
 }
 
 const groupIds = new Set(conceptGroups.map((group) => group.id));
@@ -47,20 +51,24 @@ for (const concept of allConcepts) {
 
 const duplicateChinese = examples.length - new Set(examples.map(({ example }) => example.chinese)).size;
 const duplicateEnglish = examples.length - new Set(examples.map(({ example }) => example.english)).size;
+const duplicatePlainChinese = plainChineseGlosses.length - new Set(plainChineseGlosses.map(({ plainChinese }) => plainChinese)).size;
 if (duplicateChinese) failures.push(`${duplicateChinese} duplicate Chinese examples`);
 if (duplicateEnglish) failures.push(`${duplicateEnglish} duplicate English examples`);
+if (duplicatePlainChinese) failures.push(`${duplicatePlainChinese} duplicate Plain Chinese glosses`);
 
 const average = (values) => Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
 console.log(JSON.stringify({
   concepts: allConcepts.length,
   entries: entries.length,
   examples: examples.length,
+  plainChineseGlosses: plainChineseGlosses.length,
   groups: groupIds.size,
   levels: Object.fromEntries(["undergraduate", "graduate", "doctoral"].map((level) => [level, allConcepts.filter((concept) => levelForConcept(concept) === level).length])),
   chineseLength: { min: Math.min(...examples.map(({ example }) => example.chinese.length)), average: average(examples.map(({ example }) => example.chinese.length)) },
   englishLength: { min: Math.min(...examples.map(({ example }) => example.english.length)), average: average(examples.map(({ example }) => example.english.length)) },
   duplicateChinese,
   duplicateEnglish,
+  duplicatePlainChinese,
   failures,
 }, null, 2));
 
