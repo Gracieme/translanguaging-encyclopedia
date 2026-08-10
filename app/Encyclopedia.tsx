@@ -183,6 +183,7 @@ export default function Encyclopedia() {
           <a href="handbook.html">跨语导读</a>
           <a href="sociolinguistics.html">社会语言学</a>
           <a href="applied-linguistics.html">应用语言学</a>
+          <a href="genai-language-education.html">语言教育 × AI</a>
           <a href="#lexicon" onClick={() => setIsBrowsing(true)}>查概念</a>
           <a href="#about">关于</a>
         </nav>

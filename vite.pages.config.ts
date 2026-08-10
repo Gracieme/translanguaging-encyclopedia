@@ -8,6 +8,6 @@ export default defineConfig({
   build: {
     outDir: "pages-dist",
     emptyOutDir: true,
-    rollupOptions: { input: { main: resolve(__dirname, "index.html"), handbook: resolve(__dirname, "handbook.html"), sociolinguistics: resolve(__dirname,"sociolinguistics.html"), applied: resolve(__dirname,"applied-linguistics.html") } },
+    rollupOptions: { input: { main: resolve(__dirname, "index.html"), handbook: resolve(__dirname, "handbook.html"), sociolinguistics: resolve(__dirname,"sociolinguistics.html"), applied: resolve(__dirname,"applied-linguistics.html"), genai: resolve(__dirname,"genai-language-education.html") } },
   },
 });
