@@ -5,7 +5,6 @@ import { allConcepts, conceptGroups } from "./concepts";
 import { buildConceptExample, buildPlainChinese } from "./conceptExamples";
 import { levelForConcept, levelProfiles, type LearningLevel } from "./learningLevels";
 import { sourceDefinitions } from "./sourceDefinitions";
-import { handbookChapters, handbookUnits, type HandbookChapter } from "./handbookGuide";
 
 type DeepEntry = {
   number: number;
@@ -65,8 +64,6 @@ export default function Encyclopedia() {
   const [isBrowsing, setIsBrowsing] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [copied, setCopied] = useState<"link" | "citation" | null>(null);
-  const [handbookUnit, setHandbookUnit] = useState("all");
-  const [selectedChapter, setSelectedChapter] = useState<HandbookChapter | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLElement>(null);
 
@@ -183,7 +180,7 @@ export default function Encyclopedia() {
         </a>
         <nav aria-label="主要导航">
           <a href="#paths">学习路径</a>
-          <a href="#handbook">全书导读</a>
+          <a href="handbook.html">全书导读</a>
           <a href="#lexicon" onClick={() => setIsBrowsing(true)}>查概念</a>
           <a href="#about">关于</a>
         </nav>
@@ -207,36 +204,6 @@ export default function Encyclopedia() {
               <span className="path-number">0{index + 1}</span><small>{item.eyebrow}</small><h3>{item.label}</h3><p>{item.description}</p><em>{item.outcome}</em><b>{count} 个概念 →</b>
             </button>;
           })}
-        </div>
-      </section>
-
-      <section className="handbook" id="handbook">
-        <div className="handbook-intro">
-          <div>
-            <span className="kicker">THE HANDBOOK READING LAB</span>
-            <h2>33 章，不顺读。<br />带着问题与反驳去读。</h2>
-          </div>
-          <p>这是一条从语言能力、语言本体与权力出发，经过研究方法和教育实践，最终抵达媒介、身份与理论边界的批判性阅读路线。每章都有理解题、应用题和 rebuttal；答案统一放在页面最后并默认折叠。</p>
-        </div>
-        <div className="handbook-rules" aria-label="导读原则">
-          <span><b>01</b> 先准确重建作者论证</span>
-          <span><b>02</b> 再检查证据与替代解释</span>
-          <span><b>03</b> 最后判断还能守住什么</span>
-        </div>
-        <div className="unit-tabs" aria-label="导读单元">
-          <button className={handbookUnit === "all" ? "active" : ""} onClick={() => setHandbookUnit("all")}>全部 33 章</button>
-          {handbookUnits.map((unit) => <button key={unit} className={handbookUnit === unit ? "active" : ""} onClick={() => setHandbookUnit(unit)}>{unit}</button>)}
-        </div>
-        <div className="chapter-grid">
-          {handbookChapters.filter((chapter) => handbookUnit === "all" || chapter.unit === handbookUnit).map((chapter) => (
-            <article className="chapter-card" key={chapter.chapter}>
-              <div><span>导读 {String(chapter.order).padStart(2,"0")}</span><b>原书第 {chapter.chapter} 章</b></div>
-              <small>{chapter.unit}</small>
-              <h3 lang="en">{chapter.title}</h3>
-              <h4>{chapter.chinese}</h4>
-              <button onClick={() => setSelectedChapter(chapter)}>进入章节导读 →</button>
-            </article>
-          ))}
         </div>
       </section>
 
@@ -336,27 +303,6 @@ export default function Encyclopedia() {
               })()}
             </div>
             {relatedConcepts.length > 0 && <section className="related-concepts"><span>同类概念</span><div>{relatedConcepts.map((concept) => <button key={`${concept.groupId}-${concept.term}`} onClick={() => openConcept(concept.term)}>{concept.term}</button>)}</div></section>}
-          </article>
-        </div>
-      )}
-      {selectedChapter && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelectedChapter(null)}>
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-          <article className="modal chapter-modal" role="dialog" aria-modal="true" aria-labelledby="chapter-title" onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelectedChapter(null)} aria-label="关闭章节导读">×</button>
-            <span className="entry-no">导读 {String(selectedChapter.order).padStart(2,"0")} · 原书第 {selectedChapter.chapter} 章</span>
-            <div className="bilingual-heading" id="chapter-title"><h2 lang="en">{selectedChapter.title}</h2><h3>{selectedChapter.chinese}</h3></div>
-            <section className="reading-purpose"><span>READING PURPOSE</span><h3>这一章为什么现在读？</h3><p>{selectedChapter.purpose}</p></section>
-            <section className="critical-rebuttal"><span>CRITICAL REBUTTAL</span><h3>不要轻易接受什么？</h3><p>{selectedChapter.critical}</p></section>
-            <section className="chapter-questions">
-              <span>READ WITHOUT THE ANSWERS</span><h3>本章问题</h3>
-              <ol>{selectedChapter.questions.map((item, index) => <li key={item.question}><b>{String(index + 1).padStart(2,"0")}</b><p>{item.question}</p></li>)}</ol>
-            </section>
-            <section className="answer-key">
-              <span>ANSWER KEY · 放在最后</span><h3>参考答案与可辩护立场</h3>
-              <details><summary>完成问题后再展开答案</summary><ol>{selectedChapter.questions.map((item, index) => <li key={item.answer}><b>问题 {index + 1}</b><p>{item.answer}</p></li>)}</ol><small>答案不是唯一措辞。你若能用章节证据提出更强解释、处理反例并守住推论边界，也应视为更好的答案。</small></details>
-            </section>
-            <div className="chapter-nav"><button disabled={selectedChapter.order === 1} onClick={() => setSelectedChapter(handbookChapters[selectedChapter.order - 2])}>← 上一篇</button><span>{selectedChapter.order} / 33</span><button disabled={selectedChapter.order === 33} onClick={() => setSelectedChapter(handbookChapters[selectedChapter.order])}>下一篇 →</button></div>
           </article>
         </div>
       )}
