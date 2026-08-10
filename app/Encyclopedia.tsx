@@ -180,7 +180,9 @@ export default function Encyclopedia() {
         </a>
         <nav aria-label="主要导航">
           <a href="#paths">学习路径</a>
-          <a href="handbook.html">全书导读</a>
+          <a href="handbook.html">跨语导读</a>
+          <a href="sociolinguistics.html">社会语言学</a>
+          <a href="applied-linguistics.html">应用语言学</a>
           <a href="#lexicon" onClick={() => setIsBrowsing(true)}>查概念</a>
           <a href="#about">关于</a>
         </nav>
