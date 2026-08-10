@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { doctoralSeminars, handbookChapters, handbookUnits, type HandbookChapter } from "./handbookGuide";
+import { handbookEnglishQA } from "./handbookEnglishQA";
 
 export default function HandbookReader() {
   const [unit, setUnit] = useState("all");
@@ -25,8 +26,8 @@ export default function HandbookReader() {
         <section className="reading-purpose"><span>READING PURPOSE</span><h3>这一章为什么现在读？</h3><p>{selected.purpose}</p></section>
         <section className="critical-rebuttal"><span>CRITICAL REBUTTAL</span><h3>不要轻易接受什么？</h3><p>{selected.critical}</p></section>
         <section className="doctoral-seminar" lang="en"><span>DOCTORAL SUPERVISOR’S SEMINAR</span><h3>Now let me teach this chapter.</h3><p>{doctoralSeminars[selected.chapter].lecture}</p><aside><b>Your doctoral challenge</b><p>{doctoralSeminars[selected.chapter].challenge}</p></aside></section>
-        <section className="chapter-questions"><span>READ WITHOUT THE ANSWERS</span><h3>本章问题</h3><ol>{selected.questions.map((item,index) => <li key={item.question}><b>{String(index+1).padStart(2,"0")}</b><p>{item.question}</p></li>)}</ol></section>
-        <section className="answer-key"><span>ANSWER KEY · 放在最后</span><h3>参考答案与可辩护立场</h3><details><summary>完成问题后再展开答案</summary><ol>{selected.questions.map((item,index) => <li key={item.answer}><b>问题 {index+1}</b><p>{item.answer}</p></li>)}</ol><small>答案不是唯一措辞。能用章节证据提出更强解释、处理反例并守住推论边界，也应视为更好的答案。</small></details></section>
+        <section className="chapter-questions"><span>READ WITHOUT THE ANSWERS</span><h3>本章问题 / Chapter Questions</h3><ol>{selected.questions.map((item,index) => <li key={item.question}><b>{String(index+1).padStart(2,"0")}</b><div><p>{item.question}</p><p className="parallel-english" lang="en">{handbookEnglishQA[selected.chapter][index][0]}</p></div></li>)}</ol></section>
+        <section className="answer-key"><span>ANSWER KEY · 放在最后</span><h3>参考答案 / Defensible Answers</h3><details><summary>完成问题后再展开答案 / Open only after answering</summary><ol>{selected.questions.map((item,index) => <li key={item.answer}><b>问题 {index+1} / Question {index+1}</b><p>{item.answer}</p><p className="parallel-english" lang="en">{handbookEnglishQA[selected.chapter][index][1]}</p></li>)}</ol><small>答案不是唯一措辞。能用章节证据提出更强解释、处理反例并守住推论边界，也应视为更好的答案。 / These are defensible answers, not the only acceptable wording.</small></details></section>
         <div className="chapter-nav"><button disabled={selected.order===1} onClick={() => setSelected(handbookChapters[selected.order-2])}>← 上一篇</button><span>{selected.order} / 33</span><button disabled={selected.order===33} onClick={() => setSelected(handbookChapters[selected.order])}>下一篇 →</button></div>
       </article>
     </div>}
