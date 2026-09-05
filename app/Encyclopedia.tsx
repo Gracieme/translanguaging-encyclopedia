@@ -180,12 +180,8 @@ export default function Encyclopedia() {
         </a>
         <nav aria-label="主要导航">
           <a href="#paths">学习路径</a>
-          <a href="handbook.html">跨语导读</a>
-          <a href="sociolinguistics.html">社会语言学</a>
-          <a href="applied-linguistics.html">应用语言学</a>
-          <a href="genai-language-education.html">语言教育 × AI</a>
+          <a href="reading.html">四本书导读</a>
           <a href="#lexicon" onClick={() => setIsBrowsing(true)}>查概念</a>
-          <a href="#about">关于</a>
         </nav>
       </header>
 
@@ -196,6 +192,7 @@ export default function Encyclopedia() {
           <span aria-hidden="true">⌕</span>
           <input value={query} onChange={(event) => { setQuery(event.target.value); setIsBrowsing(true); }} onFocus={() => document.querySelector("#lexicon")?.scrollIntoView({ behavior: "smooth" })} placeholder="搜索中文或英文，例如：跨语实践 / Translanguaging" aria-label="搜索中英文概念" />
         </label>
+        <div className="hero-choice"><span>或者</span><a href="reading.html">去阅读中心：选择一本书精读 →</a></div>
       </section>
 
       <section className="paths" id="paths">

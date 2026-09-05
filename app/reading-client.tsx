@@ -1,0 +1,1 @@
+import{StrictMode}from"react";import{createRoot}from"react-dom/client";import ReadingLibrary from"./ReadingLibrary";import"./globals.css";const root=document.getElementById("root");if(!root)throw new Error("Missing root");createRoot(root).render(<StrictMode><ReadingLibrary/></StrictMode>);

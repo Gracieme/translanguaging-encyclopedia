@@ -10,10 +10,10 @@ export default function HandbookReader() {
   return <main className="handbook-page">
     <header className="masthead">
       <a className="brand" href="./" aria-label="返回概念百科首页"><span className="brand-mark">TL</span><span>《The Handbook of Translanguaging》批判性导读</span></a>
-      <nav aria-label="导读导航"><a href="./">概念百科</a><a href="#chapters">章节目录</a></nav>
+      <nav aria-label="导读导航"><a href="reading.html">全部书目</a><a href="#chapters">章节目录</a></nav>
     </header>
     <section className="handbook handbook-standalone" id="chapters">
-      <div className="handbook-intro"><div><span className="kicker">THE HANDBOOK READING LAB</span><h1>33 章，不顺读。<br />带着问题与反驳去读。</h1></div><p>这是一条从语言能力、语言本体与权力出发，经过研究方法和教育实践，最终抵达媒介、身份与理论边界的批判性阅读路线。每章都有理解题、应用题和 rebuttal；答案统一放在最后并默认折叠。</p></div>
+      <div className="handbook-intro"><div><span className="kicker">《跨语研究手册》阅读路线</span><h1>33 章，不必顺读。<br />先抓住核心争论。</h1></div><div className="first-read"><b>第一次读，从这里开始</b><p>1 → 6 → 9 → 2 → 5 → 7 → 8 → 10 → 11 → 12</p><a href="#chapter-list">直接选择章节 ↓</a></div></div>
       <div className="handbook-rules" aria-label="导读原则"><span><b>01</b> 先准确重建作者论证</span><span><b>02</b> 再检查证据与替代解释</span><span><b>03</b> 最后判断还能守住什么</span></div>
       <section className="book-orientation" aria-labelledby="orientation-title">
         <div className="orientation-heading"><span>WHOLE-BOOK ORIENTATION</span><h2 id="orientation-title">全书总体导读<br /><em>What to read—and why</em></h2><p>目标不是记住 33 篇摘要，而是建立一个可以定义、比较、应用并反驳 translanguaging 的理论系统。<br /><i>The goal is not to memorize 33 summaries, but to build a theory you can define, compare, apply, and challenge.</i></p></div>
@@ -34,8 +34,8 @@ export default function HandbookReader() {
         </div>
         <div className="mastery-test"><div><span>FINAL MASTERY TEST</span><h3>读完后，你必须能完成三件事</h3></div><ol><li>用三分钟向非专业读者解释 translanguaging，同时给出反例。</li><li>比较至少三位作者的冲突性理论前提，而不是罗列术语。</li><li>设计一项研究或教学方案，并说明它可能失败在哪里。</li></ol><ol lang="en"><li>Explain translanguaging to a non-specialist in three minutes and give a counterexample.</li><li>Compare conflicting assumptions from at least three authors rather than listing terms.</li><li>Design a study or lesson and explain where it could fail.</li></ol></div>
       </section>
-      <div className="unit-tabs" aria-label="导读单元"><button className={unit === "all" ? "active" : ""} onClick={() => setUnit("all")}>全部 33 章</button>{handbookUnits.map((item) => <button key={item} className={unit === item ? "active" : ""} onClick={() => setUnit(item)}>{item}</button>)}</div>
-      <div className="chapter-grid">{handbookChapters.filter((chapter) => unit === "all" || chapter.unit === unit).map((chapter) => <article className="chapter-card" key={chapter.chapter}><div><span>导读 {String(chapter.order).padStart(2,"0")}</span><b>原书第 {chapter.chapter} 章</b></div><small>{chapter.unit}</small><h3 lang="en">{chapter.title}</h3><h4>{chapter.chinese}</h4><button onClick={() => setSelected(chapter)}>进入章节导读 →</button></article>)}</div>
+      <div id="chapter-list"><h2 className="chapter-list-title">选择一章开始读 <small>Choose a chapter</small></h2><div className="unit-tabs" aria-label="导读单元"><button className={unit === "all" ? "active" : ""} onClick={() => setUnit("all")}>全部 33 章</button>{handbookUnits.map((item) => <button key={item} className={unit === item ? "active" : ""} onClick={() => setUnit(item)}>{item}</button>)}</div>
+      <div className="chapter-grid">{handbookChapters.filter((chapter) => unit === "all" || chapter.unit === unit).map((chapter) => <article className="chapter-card" key={chapter.chapter}><div><span>导读 {String(chapter.order).padStart(2,"0")}</span><b>原书第 {chapter.chapter} 章</b></div><small>{chapter.unit}</small><h3 lang="en">{chapter.title}</h3><h4>{chapter.chinese}</h4><button onClick={() => setSelected(chapter)}>开始这一章 →</button></article>)}</div></div>
     </section>
     {selected && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
@@ -50,6 +50,6 @@ export default function HandbookReader() {
         <div className="chapter-nav"><button disabled={selected.order===1} onClick={() => setSelected(handbookChapters[selected.order-2])}>← 上一篇</button><span>{selected.order} / 33</span><button disabled={selected.order===33} onClick={() => setSelected(handbookChapters[selected.order])}>下一篇 →</button></div>
       </article>
     </div>}
-    <footer><span>《The Handbook of Translanguaging》批判性导读</span><p>Read · Question · Rebut · Rebuild</p><a href="./">返回概念百科 →</a></footer>
+    <footer><span>《The Handbook of Translanguaging》批判性导读</span><p>理解 · 质疑 · 重建</p><a href="reading.html">返回全部书目 →</a></footer>
   </main>;
 }
